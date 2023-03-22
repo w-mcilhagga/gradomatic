@@ -14,9 +14,13 @@ from .tracing import (
     index,
     backtrace,
     notrace,
-    shape
+    concat_spread,
 )
 from .memoize import memoize
+
+from .subgrad import signum
+
+use_subgrad = False
 
 
 def tensor_eye(shape):
@@ -363,6 +367,27 @@ def deriv_reshape(dYdZ, argno, A, newshape):
     return np.reshape(dYdZ, newshape)
 
 
+@register_deriv(concat_spread)
+def deriv_concat(dYdZ, argno, *args, axis=0):
+    """the derivative of concat
+
+    Args:
+        dYdZ: the derivative wrt Z
+        argno: the argument
+        *args: the matrices to concatenate
+        axis: the axis to concatenate
+
+    Returns:
+        dYdA = dYdZ*dZdA. The tensor dZdA picks out the appropriate
+        submatrix of Z
+    """
+    rows = [len(value_of(a)) if dims(a) < 2 else shape(a)[axis] for a in args]
+    Arange = np.cumsum([0, *rows])[argno : argno + 2]
+    ydim = deriv.ydim
+    idx = tuple([*[slice(None)] * (ydim + axis), slice(Arange[0], Arange[1])])
+    return dYdZ[idx]
+
+
 # ## 3.5 Unary functions.
 #
 # A unary function is $f:\mathbb{R}\rightarrow\mathbb{R}$. When applied to a tensor $A$, it yields a tensor $Z=f(A)$ of the same shape as $A$ with elements
@@ -428,7 +453,7 @@ ufunc_derivs = {
     np.exp: np.exp,
     np.log: np.reciprocal,
     np.sqrt: lambda x: 0.5 * x ** (-0.5),
-    np.abs: np.sign,
+    np.abs: lambda x: signum(x) if use_subgrad else np.sign(x),
     np.sign: lambda x: 0,
     np.sin: np.cos,
     np.cos: lambda x: -np.sin(x),
@@ -515,9 +540,61 @@ def derivatives_of(
     return d
 
 
+class Diff:
+    def __init__(self, func, argno=0):
+        self.func = func
+        self.argno = argno
+        self.vn = None
+        self.fval = None
+        self.j = None
+
+    def __call__(self, *args, **kwargs):
+        # call this if you want the function value &
+        # will later want the jacobian.
+        args = list(args)
+        self.vn = args[self.argno] = VarNode(args[self.argno])
+        self.fval = self.func(*args, **kwargs)
+        return value_of(self.fval)
+
+    def jacobian(self, gc=False):
+        # works after __call__ is called
+        self.j = derivative(self.fval)
+        # self.fval = None
+        jac = value_of(self.j)
+        if gc:
+            self.gc()
+        return jac
+
+    def hessian(self):
+        # works after jacobian is called
+        h = value_of(derivative(self.j))
+        self.gc()
+        return h
+
+    def gc(self):
+        # encourage GC:
+        self.vn = None
+        self.fval = None
+        self.j = None
+
+
 def jacobian(f, argno=0):
-    return derivatives_of(f, argno=argno, jacobian=True)
+    # return derivatives_of(f, argno=argno, jacobian=True)
+    d = Diff(f, argno)
+
+    def jac(*args, **kwargs):
+        d(*args, **kwargs)
+        return d.jacobian()
+
+    return jac
 
 
 def hessian(f, argno=0):
-    return derivatives_of(f, argno=argno, hessian=True)
+    d = Diff(f, argno)
+
+    def hess(*args, **kwargs):
+        d(*args, **kwargs)
+        d.jacobian()
+        return d.hessian()
+
+    return hess

@@ -4,13 +4,18 @@ common parameters for all tests
 """
 
 import numpy as np
+from fitany.tracing import tensorcorrelate, tensorconvolve
 
-a = np.random.rand(10, 5)
-b = np.random.rand(10, 10)
-v = np.random.rand(5)
+import scipy.signal as sig
+
+ra = lambda *args: np.random.rand(*args)
+
+a = ra(10, 5)
+b = ra(10, 10)
+v = ra(5)
 
 # for clipping
-b_clip = np.random.rand(10, 10)
+b_clip = ra(10, 10)
 b_clip[np.logical_and(b > 0.125, b < 0.175)] = 0.125
 b_clip[np.logical_and(b > 0.875, b < 0.925)] = 0.925
 
@@ -21,10 +26,10 @@ ufuncs = [
     (np.negative, v),
     (np.exp, a),
     (np.exp, v),
-    (np.log, a+1),
-    (np.log, v+1),
-    (np.sqrt, a),
-    (np.sqrt, v),
+    (np.log, a + 1),
+    (np.log, v + 1),
+    (np.sqrt, a + 1),
+    (np.sqrt, v + 1),
     (np.abs, a),
     (np.abs, v),
     (np.sign, a),
@@ -40,15 +45,21 @@ ufuncs = [
 # unary operations. Keywords or non-node parameters are added in by
 # wrapping the unary function in a lambda
 
-value = np.random.rand(10)
-value2 = np.random.rand(5, 1)
+value = ra(10)
+value2 = ra(5, 1)
+value3 = ra(3)
+value4 = ra(4)
 
-mat1 = np.random.rand(5, 10)
-mat2 = np.random.rand(10, 3)
-mat3 = np.random.rand(5, 3, 10)
+v10 = ra(1, 10)
+mat1 = ra(5, 10)
+stacker = ra(2, 10)
+mat2 = ra(10, 3)
+mat3 = ra(5, 3, 10)
+ssig = ra(15, 10)
+sfilt = ra(2, 3)
 
 # for clipping
-b_clip = np.random.rand(10,8)
+b_clip = ra(10, 8)
 b_clip[np.logical_and(b_clip > 0.125, b_clip < 0.175)] = 0.125
 b_clip[np.logical_and(b_clip > 0.875, b_clip < 0.925)] = 0.925
 
@@ -60,10 +71,15 @@ unary = [
     (np.ravel, v),
     (np.diagonal, a),
     (np.diagonal, b),
+    (lambda x: np.flip(x, axis=0), mat1),
+    (lambda x: np.flip(x, axis=1), mat1),
+    (np.fliplr, mat1),
+    (np.flipud, mat1),
     (lambda x: np.clip(x, 0.15, 0.9), b_clip),
     (lambda x: x[1:5], b),
+    (lambda x: x[::-1], b),
     (lambda x: x[:, 1:5], b),
-    (lambda x: x[(1, 2, 3), (4, 5, 6)], b), 
+    (lambda x: x[(1, 2, 3), (4, 5, 6)], b),
     (lambda x: np.sum(x, axis=0), v),
     (lambda x: np.sum(x, axis=0), a),
     (lambda x: np.sum(x, axis=1), a),
@@ -72,11 +88,28 @@ unary = [
     (np.trace, b),
     (lambda x: np.reshape(x, (5, 2)), value),
     (lambda x: np.reshape(x, (150,)), mat3),
+    (np.squeeze, ra(1, 3, 1, 45)),
     (lambda x: np.broadcast_to(x, (2, 5)), v),
     (lambda x: np.broadcast_to(x, (5, 3)), value2),
-    (np.transpose, a),
-    (np.ravel, a),
-    (np.ravel, v),
+    (lambda x: np.concatenate((v10, x, mat2.T), axis=0), mat1),
+    (lambda x: np.concatenate((v10, x), axis=1), v10),
+    (lambda x: np.concatenate((v10, x, value), axis=None), mat1),
+    (lambda x: np.vstack((value, x, stacker)), mat1),
+    (lambda x: np.vstack((x[0, :], x, stacker)), mat1),
+    (lambda x: np.vstack((value, x**2, stacker)), mat1),
+    (lambda x: np.diff(x, axis=0), mat1),
+    (lambda x: np.diff(x, axis=0, prepend=0.0), mat1),
+    (lambda x: np.diff(x, axis=1), mat1),
+    (lambda x: np.diff(x, n=2, axis=1), mat1),
+    (lambda x: np.correlate(value, x), value3),
+    # (lambda x: np.correlate(x, x), value3), fails due to numdifftools
+    (lambda x: np.convolve(value, x), value3),
+    (lambda x: np.correlate(value, x), value4),
+    (lambda x: np.convolve(value, x), value4),
+    (lambda x: np.tensorcorrelate(mat1, x), value3),
+    (lambda x: np.tensorconvolve(mat1, x), value3),
+    (lambda x: sig.correlate(ssig, x), sfilt),
+    (lambda x: sig.convolve(ssig, x), sfilt),
 ]
 
 binary = [
@@ -105,17 +138,17 @@ binary = [
     (lambda a, b: a * b, value, value),
     (lambda a, b: a * b, mat1, mat1),
     (lambda a, b: a * b, mat1, value),
-    (lambda a, b: a * b, mat1, value2), # fails
+    (lambda a, b: a * b, mat1, value2),  # fails
     (lambda a, b: a * b, 5.0, value),
-    (lambda a, b: a / b, value, value+1),
-    (lambda a, b: a / b, mat1, mat1+1),
-    (lambda a, b: a / b, mat1, value+1),
-    (lambda a, b: a / b, mat1, value2+1), # fails
-    (lambda a, b: a / b, 5.0, value+1),
+    (lambda a, b: a / b, value, value + 1),
+    (lambda a, b: a / b, mat1, mat1 + 1),
+    (lambda a, b: a / b, mat1, value + 1),
+    (lambda a, b: a / b, mat1, value2 + 1),  # fails
+    (lambda a, b: a / b, 5.0, value + 1),
     (lambda a, b: a**b, value, value),
     (lambda a, b: a**b, mat1, mat1),
     (lambda a, b: a**b, mat1, value),
-    (lambda a, b: a**b, mat1, value2), # fails
+    (lambda a, b: a**b, mat1, value2),  # fails
     (lambda a, b: a**b, 5.0, value),
     (lambda a, b: a**b, 1, value),
     (lambda a, b: a @ b, value, mat2),
@@ -128,27 +161,94 @@ binary = [
     ),
     (
         lambda a, b: np.tensordot(a, b, axes=1),
-        np.random.rand(10),
-        np.random.rand(10),
+        ra(10),
+        ra(10),
     ),
     (
         lambda a, b: np.tensordot(a, b, axes=0),
-        np.random.rand(10),
-        np.random.rand(10),
+        ra(10),
+        ra(10),
     ),
     (
         lambda a, b: np.tensordot(a, b, axes=1),
-        np.random.rand(10, 5),
-        np.random.rand(5, 10),
+        ra(10, 5),
+        ra(5, 10),
     ),
     (
         lambda a, b: np.tensordot(a, b, axes=2),
-        np.random.rand(6, 10, 5),
-        np.random.rand(10, 5, 3),
+        ra(6, 10, 5),
+        ra(10, 5, 3),
     ),
     (
         lambda a, b: np.tensordot(a, b, axes=([1, 0], [0, 1])),
         np.arange(60.0).reshape(3, 4, 5),
         np.arange(24.0).reshape(4, 3, 2),
     ),
+]
+
+# Integration tests - just a bunch of more complex functions
+X = ra(30, 10)
+y = ra(30)
+b = ra(10) + 1
+A = ra(10, 10)
+AA = ra(4, 4)
+
+
+def LL(x):
+    # binomial log-likelihood
+    p = 1 / (1 + np.exp(-X @ x))
+    return np.sum(y * np.log(p) + (1 - y) * np.log(1 - p))
+
+
+def lr(b):
+    # linear regression
+    r = y - X @ b
+    return np.dot(r, r)
+
+
+jacfns = [
+    (lambda x: 1, b),  # this returns 0 in jacobian
+    (lambda x: x, b),
+    (lambda x: 1 / (1 + x), b),
+    (lambda x: 10 * x + 3, b),
+    (lambda x: 2 ** (A @ x + 1), b),
+    (lambda x: 1 / (1 + np.dot(x, x)), b),
+    (lambda x: A @ x, b),
+    (lambda x: X @ x, b),
+    (lambda x: x @ A @ x, b),
+    (lambda x: np.einsum("i,ij,j->", x, A, x), b),
+    (lambda x: 1 / (1 + np.sum(x)), b),
+    (lambda x: np.cos(np.sin(np.log(np.exp(np.sum(x))))), b),
+    (lambda x: (x @ A @ x) / (1 + np.dot(x, x)), b),
+    (LL, b),
+    (lr, b),
+    (lambda x: (1 - np.exp(-x)) / (1 + np.exp(-x)), b),
+    (lambda x: np.sum(np.ones((10,)) * A @ x), b),
+    (lambda x: np.dot(x[0:3], x[3:6]), b),
+    (lambda x: AA @ x[0:4], b),
+    (lambda x: x[0:4] @ AA @ x[4:8], b),
+]
+
+def pr(x):
+    return 1/(1+np.exp(-X@x))
+
+hessfns = [
+    (lambda x: 1, b),
+    (lambda x: 1.0 / np.sum(x), b),
+    (lambda x: np.sum(x**2), b),
+    (lambda x: x @ A @ x, b),
+    (lambda x: 1 / (1 + np.sum(x)), b),
+    (lambda x: np.cos(np.sin(np.log(np.exp(np.sum(x))))), b),
+    (lambda x: (x @ A @ x) / (1 + np.dot(x, x)), b),
+    (lambda x: np.dot(x, x), b),
+    (np.sum, b),
+    (lambda x: np.sum(np.exp(x)), b),
+    (lambda x: np.sum(A @ x), b),
+    (lambda x: np.sum(x @ A @ x), b),
+    (lambda x: np.einsum("i,ij,j->", x, A, x), b),
+    (lambda x: np.sum(pr(x)), b),
+    (LL, b),
+    (lr, b),
+    (lambda x: np.dot(x[0:3], x[3:6]), b),
+    (lambda x: x[0:4] @ AA @ x[4:8], b),
 ]

@@ -3,8 +3,22 @@
 
 
 import numpy as np
-from .tracing import Node, VarNode, OpNode, dims, value_of, getroot, index
+from .tracing import (
+    Node,
+    VarNode,
+    OpNode,
+    dims,
+    value_of,
+    getroot,
+    index,
+    shape,
+    concat_spread,
+)
 from .memoize import memoize
+
+from .subgrad import signum
+
+use_subgrad = False
 
 
 def tensor_eye(shape):
@@ -21,11 +35,6 @@ def tensor_eye(shape):
 
 
 # have to do my own caching because ndarray isn't hashable
-# NB the caching could be smarter if backtrace is used
-# because we only need to keep results that are called for >1 time
-
-# memoizing has to be on the varnode, so derivatives are separate
-# from one another.
 
 
 @memoize
@@ -42,9 +51,8 @@ def deriv(Z):
         return tensor_eye(Z.shape)
     if type(Z) is OpNode:
         return deriv_ops[Z.fn](*Z.args, **Z.kwargs)
-    # otherwise, Z doesn't depend on the node - I need to know the node
-    # shape of X to return the correct size, and I don't actually have it.
-    # However, zero does a good job
+    # otherwise, Z doesn't depend on the node. This should be
+    # a zero tensor but the shape is sometimes unknown; 0 works fine.
     return 0.0
 
 
@@ -58,7 +66,7 @@ def derivative(Y):
         a node implementing dY/dX, where X is the root varnode in the tree
 
     Note:
-        This does some necessary housekeeping before & after calling deriv
+        This does some necessary housekeeping before & after calling `deriv`
     """
     oldcache, deriv.cache = deriv.cache, {}
     dYdX = deriv(Y)
@@ -118,7 +126,7 @@ def deriv_neg(A):
 def deriv_multiply(A, B):
     """for Z=A*B, returns dZdX=A*dBdX + dAdX*B.
     However, one of A, B is guaranteed to be a scalar with ddX=0
-    Other forms of multiplication are einsummed
+    Other forms of multiplication are converted to einsum
     """
     if np.isscalar(A):
         return np.multiply(A, deriv(B))
@@ -218,7 +226,7 @@ def deriv_script(lhs, rhs, wrt, i, args):
     Args:
         lhs, rhs: the left and right hand sides of the einsum script (see `parse_script`)
         wrt: the indices of the X tensor we are differentiating with respect to
-        i: the item index (i.e. lhs[i])
+        i: the item index (i.e. lhs[i]) to do the derivative
         args: the argument list to be passed to the einsum.
 
     Returns:
@@ -227,7 +235,7 @@ def deriv_script(lhs, rhs, wrt, i, args):
 
     Example:
         if Z = np.einsum(script, A, B), then
-        dZdX = np.einsum(ds0,dAdX, B)+np.einsum(ds1, A, dBdX) where
+        dZdX = np.einsum(ds0,dAdX, B)+np.einsum(ds1, A, dBdX), where
         ds0 = deriv_script(lhs, rhs, Xindex, 0, (A,B)) and
         ds1 = deriv_script(lhs, rhs, Xindex, 1, (A,B))
     """
@@ -256,11 +264,11 @@ def summate(nodes):
 
 
 @register_deriv(np.einsum)
-def deriv_einsum(inscript, *args, **kwargs):
+def deriv_einsum(script, *args, **kwargs):
     """computes the derivative of an einsum
 
     Args:
-        inscript: the einsum script
+        script: the einsum script
         *args: the einsum arguments
         **kwargs: the einsum keyword arguments
 
@@ -271,7 +279,7 @@ def deriv_einsum(inscript, *args, **kwargs):
         dZdX = np.einsum(ds0, dAdX, B)+np.einsum(ds1, A, dBdX)
         where ds0, ds1 come from deriv_script
     """
-    lhs, rhs, available = parse_script(inscript)
+    lhs, rhs, available = parse_script(script)
     wrt = available[: len(getroot(*args).derivshape)]
     terms = []
     args = [*args]
@@ -312,11 +320,36 @@ def deriv_reshape(A, newshape):
         newshape: the shape following reshaping
 
     Returns:
-        If Z=np.reshape(A, ns), this returns dZdX = np.reshape(dAdX, [*ns, *Xshape])
+        If Z=np.reshape(A, ns), this returns
+        dZdX = np.reshape(dAdX, [*ns, *Xshape]) where Xshape is the shape of
+        the X variable
     """
     dAdX = deriv(A)
     newshape = [*newshape, *dAdX.shape[-len(A.root.derivshape) :]]
     return np.reshape(dAdX, newshape)
+
+
+@register_deriv(concat_spread)
+def deriv_concat(*args, axis=0):
+    """the derivative of concat
+
+    Args:
+        *args: the matrices to concatenate
+        axis: the axis to concatenate
+
+    Returns:
+        If Z = concat_spread(T1, T2, ..., axis=x), this returns
+        dZdX = concat_spread(dT1dX, dT2dX, ... axis=x)
+    """
+    derivshape = getroot(*args).derivshape
+    dTdX = []
+    for a in args:
+        if not Node.isNode(a):
+            da = np.zeros((*shape(a), *derivshape))
+        else:
+            da = deriv(a)
+        dTdX.append(da)
+    return concat_spread(*dTdX, axis=axis)
 
 
 r"""
@@ -353,14 +386,14 @@ So we need to invent a new operation `premult` which broadcasts from the front.
 """
 
 
-def premult(dfA, dAdX):
-    """computes dfA*dAdX for ufunc derivatives"""
+def premult(dZdA, dAdX):
+    """computes dZdX = dZdA*dAdX"""
     bi = "ijklmnopqrstuvw"[: dAdX.ndim]
-    if np.isscalar(dfA):
+    if np.isscalar(dZdA):
         ai = ""
     else:
-        ai = bi[: dfA.ndim]
-    return np.einsum(ai + "," + bi + "->" + bi, dfA, dAdX)
+        ai = bi[: dZdA.ndim]
+    return np.einsum(ai + "," + bi + "->" + bi, dZdA, dAdX)
 
 
 @register_deriv(np.power)
@@ -369,10 +402,14 @@ def deriv_power(A, n):
 
     Args:
         A: the node
-        n: the power
+        n: the power, a non-node
 
     Returns:
-        If Z = A**N, returns dZdX = n*dAdX**(n-1)
+        If Z = A**n, returns dZdX = n*dAdX**(n-1)
+
+    Notes:
+        This is handled differently from other ufuncs because
+        of some common simplifications when n is 1 or 2
     """
     dAdX = deriv(A)
     if n == 1:
@@ -395,7 +432,7 @@ ufunc_derivs = {
     np.exp: np.exp,
     np.log: np.reciprocal,
     np.sqrt: lambda x: 0.5 * x ** (-0.5),
-    np.abs: np.sign,
+    np.abs: lambda x: signum(x) if use_subgrad else np.sign(x),
     np.sign: lambda x: 0,
     np.sin: np.cos,
     np.cos: lambda x: -np.sin(x),
@@ -408,7 +445,17 @@ for f, df in ufunc_derivs.items():
 
 
 def deriv_clip(A, amin=None, amax=None):
-    """derivative of clip"""
+    """derivative of clip
+
+    Args:
+        A: a node
+        amin, amax: the clipping values
+
+    Returns:
+        If Z = np.clip(A), this returns
+        dZdA = 1 if not clipped, 0 if clipped.
+        This is then fed into the usual ufunc derivative.
+    """
     vA = value_of(A)
     ok = True
     if amin is not None:
@@ -541,11 +588,63 @@ def derivatives_of(fn, argno=0, value=False, jacobian=False, hessian=False):
     return calc_d
 
 
+class Diff:
+    def __init__(self, func, argno=0):
+        self.func = func
+        self.argno = argno
+        self.vn = None
+        self.fval = None
+        self.j = None
+
+    def __call__(self, *args, **kwargs):
+        # call this if you want the function value &
+        # will later want the jacobian.
+        args = list(args)
+        self.vn = args[self.argno] = VarNode(args[self.argno])
+        self.fval = self.func(*args, **kwargs)
+        return value_of(self.fval)
+
+    def jacobian(self, gc=False):
+        # works after __call__ is called
+        self.j = derivative(self.fval)
+        # self.fval = None
+        jac = value_of(self.j)
+        if gc:
+            self.gc()
+        return jac
+
+    def hessian(self):
+        # works after jacobian is called
+        h = value_of(derivative(self.j))
+        self.gc()
+        return h
+
+    def gc(self):
+        # encourage GC:
+        self.vn = None
+        self.fval = None
+        self.j = None
+
+
+# these are just for testing
+
+
 def jacobian(f, argno=0):
-    """returns a function to calculate just the jacobian"""
-    return derivatives_of(f, argno=argno, jacobian=True)
+    d = Diff(f, argno)
+
+    def jac(*args, **kwargs):
+        d(*args, **kwargs)
+        return d.jacobian()
+
+    return jac
 
 
 def hessian(f, argno=0):
-    """returns a function to calculate just the hessian"""
-    return derivatives_of(f, argno=argno, hessian=True)
+    d = Diff(f, argno)
+
+    def hess(*args, **kwargs):
+        d(*args, **kwargs)
+        d.jacobian()
+        return d.hessian()
+
+    return hess

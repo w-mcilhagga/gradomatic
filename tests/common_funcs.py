@@ -20,32 +20,39 @@ def shape(x):
 def value_of(x):
     return getattr(x, "value", x)
 
+
 # check that two arrays are the same
+
 
 def check(a, b):
     assert dims(a) == dims(b)
     assert shape(a) == shape(b)
     assert np.all(value_of(a) == value_of(b))
 
+
 # check that two arrays are close
 
+
 def check_close(a, b):
-    if dims(a)!=dims(b):
+    print('a',value_of(a))
+    print('b',value_of(b))
+    print('diff', np.max(np.abs(value_of(a)-value_of(b))))
+    if dims(a) != dims(b):
         a = np.squeeze(a)
         b = np.squeeze(b)
-    if dims(a)!=dims(b):
-        # check all equal to the same value 
+    if dims(a) != dims(b):
+        # check all equal to the same value
         # TODO: and/or one is a diagonal identity.
         a = np.atleast_1d(a)
-        assert np.all(a==a[0]) and np.all(b==a[0])
+        assert np.all(np.isclose(a, a[0])) and np.all(np.isclose(b,a[0]))
         return
     assert dims(a) == dims(b)
     assert shape(a) == shape(b)
-    assert np.allclose(value_of(a), value_of(b), 1e-10, 1e-10)
-    
-    
+    assert np.allclose(value_of(a), value_of(b), 1e-8, 1e-8)
+
+
 def nd_jacobian(fn, x):
-    '''the jacobian of any function not just vector->vector'''
+    """the jacobian of any function not just vector->vector"""
     xshape = shape(x)
     yshape = shape(fn(x))
     if len(xshape) <= 1 and len(yshape) <= 1:

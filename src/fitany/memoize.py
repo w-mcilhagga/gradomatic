@@ -37,7 +37,7 @@ def hash_or_id(x):
 
 def memoize_by_id(f):
     # memoizes using id if necessary; assumes that
-    # the object pointed to by id doesn't change
+    # the object pointed to by id is de-facto immutable
     @wraps(f)
     def memo_f(*args, **kwargs):
         args = tuple(hash_or_id(a) for a in args)

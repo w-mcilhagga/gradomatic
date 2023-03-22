@@ -54,6 +54,8 @@ def shape(x):
 
 
 def value_of(x):
+    # if type(x) in [list, tuple]:
+    #    return type(x)(value_of(a) for a in x)
     return getattr(x, "value", x)
 
 
@@ -155,6 +157,9 @@ class Node:
     def __hash__(self):
         # required because __eq__ was overridden
         return id(self)
+
+    def __len__(self):
+        return self.shape[0]
 
     # numpy dispatch for when one of the objects is a numpy array
 
@@ -262,7 +267,10 @@ def getroot(*args):
         the root property of the first argument which is a Node
     """
     for a in args:
-        g = getattr(a, "root", False)
+        if type(a) in [list, tuple]:
+            g = getroot(*a)
+        else:
+            g = getattr(a, "root", False)
         if Node.isNode(g):
             return g
     return None
@@ -298,13 +306,13 @@ def opnode(fn, *args, **kwargs):
     # see if the opnode is already in existence
     key = tuple([fn, *[hash_or_id(a) for a in args]])
     try:
-        root = getroot(*args)  # the root holds the node meo cache
+        root = getroot(*args)  # the root holds the node memo cache
         if key not in root.memo:
             root.memo[key] = OpNode(fn, *args, root=root, **kwargs)
         return root.memo[key]
     except Exception as e:
         # something went wrong - this shouldn't happen normally
-        print("memo failure in opnode", fn.__name__, e)
+        print("failure in opnode", fn.__name__, e)
         print("    with key", key)
         print("    with args", args)
         return OpNode(fn, *args, root=root, **kwargs)
@@ -331,12 +339,12 @@ def check_broadcasting(*args):
     ]
 
 
-def makeaddnode(fn, a, b, **kwargs):
+def makeaddnode(fn, a, b):
     # an add node is an opnode with fn=np.add or np.subtract;
     # it is separated out to check broadcasting.
     # kwargs is ignored.
     a, b = check_broadcasting(a, b)
-    return opnode(fn, a, b, **kwargs)
+    return opnode(fn, a, b)
 
 
 # all of the handled functions are automatically not traced, an opnode is created instead.
@@ -396,7 +404,7 @@ def do_diagonal(m):
 
 @Node.register_handler(np.diag)
 def do_diag(m):
-    # ignore kwargs
+    # ignore kwargs for now.
     if dims(m) >= 2:
         return do_diagonal(m)
     # ndims==1
@@ -415,12 +423,35 @@ def do_flatten(m):
     return np.reshape(m, (sz,))
 
 
+@Node.register_handler(np.squeeze)
+def do_squeeze(m):
+    squeezed = [i for i in shape(m) if i > 1]
+    return np.reshape(m, squeezed)
+
+
+@Node.register_handler(np.flip)
+def do_flip(m, axis=None):
+    idx = [slice(None)] * dims(m)
+    idx[axis] = slice(None, None, -1)
+    return m[tuple(idx)]
+
+
+@Node.register_handler(np.fliplr)
+def do_fliplr(m, axis=None):
+    return m[:, ::-1]
+
+
+@Node.register_handler(np.flipud)
+def do_flipud(m, axis=None):
+    return m[::-1]
+
+
 @Node.register_handler(np.multiply)
 def mult(a, b):
     # multiply deals with a few special cases that turn up
     # quite frequently
     if np.isscalar(a):
-        if a==0:
+        if a == 0:
             return 0
         if a == 1:
             return b
@@ -435,7 +466,7 @@ def mult(a, b):
             return np.negative(a)
     # we do need to broadcast here rather than leave it to einsum_equiv
     # because that doesn't always work
-    a, b = check_broadcasting(a,b)
+    a, b = check_broadcasting(a, b)
     return opnode(np.multiply, a, b)
 
 
@@ -478,13 +509,14 @@ def not_implemented(f):
     return fail
 
 
+# a selection of non-implemented functions, fill out the rest later
+
 for fn in [
-    np.flip,
-    np.flipud,
-    np.fliplr,
-    np.concatenate,
-    np.hstack,
-    np.vstack,
+    np.stack,  # all arrays the same size
+    np.roll,
+    np.rot90,
+    np.gradient,
+    np.ediff1d,
 ]:
     (
         lambda fn: Node.add_handler(
@@ -521,6 +553,169 @@ def notrace(f):
     nt.untraced = True
 
     return nt
+
+
+# numpy tuple args don't work well with
+# the derivative operations, so we break them out
+
+
+@Node.register_handler(np.vstack)
+def do_vstack(T):
+    T = list(T)
+    for i, t in enumerate(T):
+        if dims(t) == 1:
+            T[i] = np.reshape(t, (1, shape(t)[0]))
+    return opnode(concat_spread, *T, axis=0)
+
+
+@Node.register_handler(np.hstack)
+def do_hstack(T):
+    # the numpy implementation of hstack for 1D arrays is
+    # daft, but kept here anyway.
+    return opnode(concat_spread, *T, axis=dims(T[0]) - 1)
+
+
+@Node.register_handler(np.concatenate)
+def do_concat(T, axis=0):
+    # When axis is None, we just flatten everything &
+    # concatenate along axis=0. This is so the derivative
+    # works with this case.
+    if axis is None:
+        T = [np.ravel(a) for a in T]
+        axis = 0
+    return opnode(concat_spread, *T, axis=axis)
+
+
+@notrace
+def concat_spread(*args, axis=0):
+    return np.concatenate(args, axis=axis)
+
+
+from .lib import diffmat
+
+
+@Node.register_handler(np.diff)
+def do_diff(a, n=1, axis=-1, prepend=np._NoValue, append=np._NoValue):
+    # diff is implemented by numpy as indexing and subtraction,
+    # so we re-implement it here, changing some checks.
+    # It would be nice to just use np.diff.__wrapped__ but this calls
+    # asanyarray & this can't be wrapped inside np.diff - calls it without
+    # the dispatch mechanism
+    if n == 0:
+        return a
+    if n < 0:
+        raise ValueError("order must be non-negative but got " + repr(n))
+    nd = dims(a)
+    if axis < 0:
+        axis = nd + axis
+
+    combined = []
+    if prepend is not np._NoValue:
+        if dims(prepend) == 0:
+            shape_ = list(shape(a))
+            shape_[axis] = 1
+            prepend = np.broadcast_to(prepend, tuple(shape_))
+        combined.append(prepend)
+
+    combined.append(a)
+
+    if append is not np._NoValue:
+        if dims(append) == 0:
+            shape_ = list(shape(a))
+            shape_[axis] = 1
+            append = np.broadcast_to(append, tuple(shape_))
+        combined.append(append)
+
+    if len(combined) > 1:
+        a = np.concatenate(combined, axis)
+
+    # create the difference matrix directly because it will
+    # come out anyway in the derivative
+    dmat = diffmat(shape(a)[axis], n=n)
+    didx = "ijklmnopqrstuvwxyz"[:2]
+    idx = "ijklmnopqrstuvwxyz"[2 : dims(a) + 2]
+    idx = idx.replace(idx[axis], didx[1])
+    result = idx.replace(idx[axis], didx[0])
+    return np.einsum(didx + "," + idx + "->" + result, dmat, a)
+
+    # the code below was taken from np.diff & isn't used here
+    # Might be reinstated if there are some efficiency problems with
+    # the diff mat approach.
+
+    # make slices
+    slice1 = [slice(None)] * nd
+    slice1[axis] = slice(1, None)
+    slice1 = tuple(slice1)
+
+    slice2 = [slice(None)] * nd
+    slice2[axis] = slice(None, -1)
+    slice2 = tuple(slice2)
+
+    for _ in range(n):
+        a = a[slice1] - a[slice2]
+    return a
+
+
+from .lib import np_correlate, np_convolve
+from .convolve import tensorcorrelate as tcorr, tensorconvolve as tconv
+
+
+@Node.register_handler(np.correlate)
+def correlate(a, v, mode="valid"):
+    if not Node.isNode(a):
+        return tcorr(a, v, mode=mode)
+    else:
+        return np_correlate(a, v, mode=mode)
+
+
+@Node.register_handler(np.convolve)
+def convolve(a, v, mode="full"):
+    if not Node.isNode(a):
+        return tconv(a, v, mode=mode)
+    else:
+        return np_convolve(a, v, mode=mode)
+
+
+def tensorcorrelate(a, v, mode="full", axes=-1):
+    if Node.isNode(a):
+        raise ValueError("a cannot be a varnode")
+    return tcorr(a, v, mode=mode, axes=axes)
+
+
+def tensorconvolve(a, v, mode="full", axes=-1):
+    if Node.isNode(a):
+        raise ValueError("a cannot be a varnode")
+    return tconv(a, v, mode=mode, axes=axes)
+
+
+# add to numpy
+np.tensorcorrelate = tensorcorrelate
+np.tensorconvolve = tensorconvolve
+
+
+# monkeypatching scipy.signal functions. This always works if tracing is imported
+# before scipy.signal, and sometimes works if imported after, so long as
+# convolve is not dereferenced until after importing tracing.py
+
+from .monkey import override
+
+
+@override("scipy.signal.correlate", np.ndarray, [VarNode, OpNode])
+def scipy_correlate(in1, in2, mode="full", method="auto"):
+    if dims(in1) != dims(in2):
+        raise ValueError(
+            "volume and kernel should have the same dimensionality"
+        )
+    return tensorcorrelate(in1, in2, mode=mode, axes=-1)
+
+
+@override("scipy.signal.convolve", np.ndarray, [VarNode, OpNode])
+def scipy_convolve(in1, in2, mode="full", method="auto"):
+    if dims(in1) != dims(in2):
+        raise ValueError(
+            "volume and kernel should have the same dimensionality"
+        )
+    return tensorconvolve(in1, in2, mode=mode, axes=-1)
 
 
 # ## Backwards References.
