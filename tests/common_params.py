@@ -4,7 +4,6 @@ common parameters for all tests
 """
 
 import numpy as np
-from fitany.tracing import tensorcorrelate, tensorconvolve
 
 import scipy.signal as sig
 
@@ -40,6 +39,12 @@ ufuncs = [
     (np.sin, v),
     (np.tan, a),
     (np.tan, v),
+    (np.max, a),
+    (lambda x: np.max(x, axis=0), a),
+    (lambda x: np.min(x, axis=0), a),
+    (lambda x: np.max(x, axis=1), a),
+    (lambda x: np.max(x, axis=0, keepdims=True), a),
+    (lambda x: np.min(x, axis=0, keepdims=True), a),
 ]
 
 # unary operations. Keywords or non-node parameters are added in by
@@ -110,6 +115,12 @@ unary = [
     (lambda x: np.tensorconvolve(mat1, x), value3),
     (lambda x: sig.correlate(ssig, x), sfilt),
     (lambda x: sig.convolve(ssig, x), sfilt),
+    (lambda x: np.maximum(x, 0.5), value),
+    (lambda x: np.minimum(x, 0.5), value),    
+    (lambda x: np.maximum(x, v10.flatten()), value),
+    (lambda x: np.minimum(x, v10.flatten()), value),
+    (lambda x: np.maximum(x, 1-x), value),
+    (lambda x: np.minimum(x, 1-x), value),
 ]
 
 binary = [

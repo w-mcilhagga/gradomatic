@@ -11,24 +11,20 @@ up = os.path.normpath(os.path.join(os.getcwd(), "src"))
 sys.path.append(up)
 sys.path.append(os.getcwd())
 
-#import numdifftools as nd
-#from fitany.tracing import value_of, dims, shape
-import fitany.forward as fwd
-import fitany.reverse as rev
-    
-# now do tests
-
 import numpy as np
-    
-    
-value2 = np.random.rand(10)
+from fitany.autodiff.subgrad import Subgrad
+from fitany.autodiff.printtrace import graph_fwd
+import fitany.autodiff.forward as fwd
 
-mat1 = np.random.rand(10,5)
+fwd.use_subgrad = True
 
-mul = lambda x: np.sum(np.diff(x, n=2)**2)
+def lasso(x):
+    # min = (0,0,...0)
+    return np.sum(np.abs(x))   
 
-d = fwd.Diff(mul)
+ld = fwd.Diff(lasso)
+val = ld.trace(np.array([-1.0,0,1]))
+j = ld.jacobian()
 
-print(d(value2))
-print(d.jacobian())
-print(d.hessian())
+graph_fwd(ld.fval)
+print(ld.j.lo)

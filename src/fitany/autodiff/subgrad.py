@@ -7,22 +7,23 @@ Created on Thu Mar 16 14:56:49 2023
 
 import numpy as np
 
+value_of = lambda x: getattr(x, 'value', x)
 
 class Subgrad:
     @staticmethod
     def isgrad(n):
         """checks if a subgrad object n is really a grad"""
-        return Subgrad.issubgrad(n) and not np.all(np.isclose(n.lo, n.hi))
-
+        return isinstance(n, Subgrad) and not np.all(np.isclose(n.lo, n.hi))
+    
     @staticmethod
-    def issubgrad(n):
-        # checks if an object is a subgrad
-        return isinstance(n, Subgrad)
+    def assubgrad(n):
+        return n if isinstance(n, Subgrad) else Subgrad(n,n)
 
     def __init__(self, a, b):
         # [a,b] is an interval
         self.lo = np.minimum(a, b)
         self.hi = np.maximum(a, b)
+        self.ndim = getattr(a, 'ndim', 0)
 
     # operator overrides for operations involving python objects
 
@@ -78,13 +79,18 @@ class Subgrad:
     def asarray(self):
         # converts to a numpy array - if bracketing zero, returns zero,
         # otherwise returns the value closest to zero.
-        pos = np.logical_and(self.lo > 0, self.hi > 0)
-        neg = np.logical_and(self.lo < 0, self.hi < 0)
-        arr = np.zeros(self.lo.shape)
-        arr[pos] = np.minimum(self.lo[pos], self.hi[pos])
-        arr[neg] = np.maximum(self.lo[neg], self.hi[neg])
+        L = value_of(self.lo)
+        H = value_of(self.hi)
+        pos = np.logical_and(L > 0, H > 0)
+        neg = np.logical_and(L < 0, H < 0)
+        arr = np.zeros(L.shape)
+        arr[pos] = np.minimum(L[pos], H[pos])
+        arr[neg] = np.maximum(L[neg], H[neg])
         return arr
 
+    def __array__(self, dtype=None):
+        return self.asarray()
+    
     # numpy dispatch for when one of the objects is a numpy array
 
     handled_funcs = {}
@@ -121,50 +127,40 @@ class Subgrad:
 @Subgrad.register_handler(np.add)
 def s_add(a, b):
     # either a, b or both are subgrads
-    if not Subgrad.issubgrad(a):
-        a = Subgrad(a, a)
-    if not Subgrad.issubgrad(b):
-        b = Subgrad(b, b)
+    a = Subgrad.assubgrad(a)
+    b = Subgrad.assubgrad(b)
     return Subgrad(a.lo + b.lo, a.hi + b.hi)
 
 
 @Subgrad.register_handler(np.subtract)
 def s_subtract(a, b):
     # either a, b or both are subgrads
-    if not Subgrad.issubgrad(a):
-        a = Subgrad(a, a)
-    if not Subgrad.issubgrad(b):
-        b = Subgrad(b, b)
+    a = Subgrad.assubgrad(a)
+    b = Subgrad.assubgrad(b)
     return Subgrad(a.lo - b.lo, a.hi - b.hi)
 
 
 @Subgrad.register_handler(np.multiply)
 def s_mul(a, b):
     # either a, b or both are subgrads
-    if not Subgrad.issubgrad(a):
-        a = Subgrad(a, a)
-    if not Subgrad.issubgrad(b):
-        b = Subgrad(b, b)
+    a = Subgrad.assubgrad(a)
+    b = Subgrad.assubgrad(b)
     return Subgrad(a.lo * b.lo, a.hi * b.hi)
 
 
 @Subgrad.register_handler(np.true_divide)
 def s_div(a, b):
     # either a, b or both are subgrads
-    if not Subgrad.issubgrad(a):
-        a = Subgrad(a, a)
-    if not Subgrad.issubgrad(b):
-        b = Subgrad(b, b)
+    a = Subgrad.assubgrad(a)
+    b = Subgrad.assubgrad(b)
     return Subgrad(a.lo / b.lo, a.hi / b.hi)
 
 
 @Subgrad.register_handler(np.power)
 def s_pow(a, b):
     # either a, b or both are subgrads
-    if not Subgrad.issubgrad(a):
-        a = Subgrad(a, a)
-    if not Subgrad.issubgrad(b):
-        b = Subgrad(b, b)
+    a = Subgrad.assubgrad(a)
+    b = Subgrad.assubgrad(b)
     return Subgrad(a.lo**b.lo, a.hi**b.hi)
 
 
@@ -177,7 +173,7 @@ def s_neg(a):
 def s_einsum(script, *args, **kwargs):
     # an implementation, but probably not the right one.
     args = list(args)
-    argno = next(filter(lambda p: Subgrad.issubgrad(p[1]), enumerate(args)))[0]
+    argno = next(filter(lambda p: isinstance(p[1], Subgrad), enumerate(args)))[0]
     sg = args[argno]
     args[argno] = sg.lo
     low = np.einsum(script, *args, **kwargs)
@@ -185,8 +181,9 @@ def s_einsum(script, *args, **kwargs):
     high = np.einsum(script, *args, **kwargs)
     return Subgrad(low, high)
 
-
 def signum(x):
-    # returns the subgrad of sign(x)
+    # returns the subgrad of abs(x)
+    x = value_of(x) # not differentiable
     sx = np.sign(x)
-    return Subgrad(sx - (sx == 0), sx + (sx == 0))
+    sz = sx==0
+    return Subgrad(sx - sz, sx + sz)

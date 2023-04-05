@@ -36,6 +36,9 @@ some functions ignore additional keyword arguments. This needs to be
 explicitly warned.
 """
 
+# TODO:
+# amin, amax, less greater, etc (as that's how the comparisons are implemented)
+
 from collections import defaultdict
 from functools import wraps
 import numpy as np
@@ -294,7 +297,7 @@ def opnode(fn, *args, **kwargs):
             b) checks to see if the opnode has already been created
 
         The latter case can occur if a variable is used more than once in a
-        computation, and memoizing it can lead to a big gain in speed.
+        computation, and memoizing it can lead to a gain in speed.
     """
     # try and replace fn with an einsum
     eq = einsum_equivalent(fn, *args, **kwargs)
@@ -365,6 +368,8 @@ for fn in [
     np.log,
     np.sqrt,
     np.abs,
+    np.fabs,
+    np.absolute,  # we ignore complex case
     np.sign,
     np.cos,
     np.sin,
@@ -499,33 +504,55 @@ def powernode(a, b):
         return np.exp(np.multiply(np.log(a), b))
 
 
-# numpy functions which aren't yet implemented will raise an error
-def not_implemented(f):
-    def fail(*args, **kwargs):
-        raise NotImplementedError(
-            f"{f.__name__} is not implemented for tracing"
-        )
+@Node.register_handler(np.maximum)
+def maximum(a, b):
+    # when equal, returns the average of a & b
+    va = value_of(a)
+    vb = value_of(b)
+    eq = va == vb
+    return ((va > vb) + 0.5 * eq) * a + ((vb > va) + 0.5 * eq) * b
 
-    return fail
+
+@Node.register_handler(np.minimum)
+def minimum(a, b):
+    # when equal, returns the average of a & b
+    va = value_of(a)
+    vb = value_of(b)
+    eq = va == vb
+    return ((va < vb) + 0.5 * eq) * a + ((vb < va) + 0.5 * eq) * b
 
 
-# a selection of non-implemented functions, fill out the rest later
+@Node.register_handler(np.amax)
+def arraymax(a, axis=None, out=None, *, keepdims=np._NoValue):
+    idx = np.argmax(value_of(a), axis=axis, keepdims=True)
+    return pick(a, idx, axis, keepdims)
 
-for fn in [
-    np.stack,  # all arrays the same size
-    np.roll,
-    np.rot90,
-    np.gradient,
-    np.ediff1d,
-]:
-    (
-        lambda fn: Node.add_handler(
-            fn,
-            lambda *args, **kwargs: OpNode(
-                not_implemented(fn), *args, **kwargs
-            ),
-        )
-    )(fn)
+
+@Node.register_handler(np.amin)
+def arraymin(a, axis=None, out=None, *, keepdims=np._NoValue):
+    idx = np.argmin(value_of(a), axis=axis, keepdims=True)
+    return pick(a, idx, axis, keepdims)
+
+
+def pick(a, idx, axis, keepdims):
+    # translates the argmax index to something reasonable
+    if axis is None:
+        return a[np.unravel_index(idx, shape=shape(a))]
+    # otherwise ... complicated
+    indices = np.meshgrid(*[range(n) for n in shape(a)], indexing = 'ij')
+    indices[axis]=idx
+    pic = a[tuple(indices)]
+    # pic is the same size as a with the dimension along axis repeated,
+    # so this has to be removed
+    indices = [slice(None, None, None)]*dims(a)
+    indices[axis]=0
+    pic = pic[tuple(indices)]
+    # insert the 1-sized index if keepdims is True
+    if keepdims is True:
+        sh = list(shape(a))
+        sh[axis] = 1
+        pic = np.reshape(pic, sh)
+    return pic
 
 
 def notrace(f):
@@ -692,6 +719,36 @@ def tensorconvolve(a, v, mode="full", axes=-1):
 np.tensorcorrelate = tensorcorrelate
 np.tensorconvolve = tensorconvolve
 
+
+# numpy functions which aren't yet implemented will raise an error
+def not_implemented(f):
+    def fail(*args, **kwargs):
+        raise NotImplementedError(
+            f"{f.__name__} is not implemented for tracing"
+        )
+
+    return fail
+
+
+# a selection of non-implemented functions, fill out the rest later
+
+for fn in [
+    np.stack,  # all arrays the same size
+    np.roll,
+    np.rot90,
+    np.gradient,
+    np.ediff1d,
+    np.less,
+    np.greater,  # etc.
+]:
+    (
+        lambda fn: Node.add_handler(
+            fn,
+            lambda *args, **kwargs: OpNode(
+                not_implemented(fn), *args, **kwargs
+            ),
+        )
+    )(fn)
 
 # monkeypatching scipy.signal functions. This always works if tracing is imported
 # before scipy.signal, and sometimes works if imported after, so long as

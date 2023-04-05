@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>fitany.autodiff.tracing API documentation</title>
+<meta name="description" content="Tracing …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fitany.autodiff.tracing</code></h1>
+</header>
+<section id="section-intro">
+<p>Tracing.</p>
+<p>Tracing a function call and returning a computation graph is the core of automatic
+differentiation. An important issue is to make sure the tracer can deal with
+<code>numpy</code> dispatch, and can convert <code>numpy</code> functions to <code>einsum</code> where
+appropriate, since we know how to take the derivative of <code>einsum</code>s.</p>
+<h1 id="nodes">Nodes</h1>
+<p>A node is an object used to trace a computation and produce a computation tree
+for differentiation. Given a function <code>f(a,b,c,&hellip;)</code>, to trace the computation
+of, say, <code>b</code>, you would call
+<code>tree = f(a,VarNode(b),c,...)</code>.</p>
+<p>The computation tree is composed of <code>VarNodes</code> which encapsulate a variable
+and <code>OpNodes</code> which encapsulate an operation. The return value <code>tree</code> is an OpNode.
+For OpNodes, <code>tree.value</code> is the value <code>f(a,b,c,&hellip;)</code>. The tree can be operated on to
+get derivatives.</p>
+<p>There should be only one VarNode.</p>
+<h1 id="operations">Operations.</h1>
+<p>When tracing, an operation is frequently changed for another equivalent one,
+to make differentiating easier. The changes are:</p>
+<p>a/b -&gt; a<em>b</em>*(-1.0)
+sum, inner, outer, dot, @, tensordot, broadcast_to, transpose -&gt; einsum
+* (where both are arrays) -&gt; einsum
+trace, ravel, diagonal -&gt; replaced with equivalent indexing, reshaping
+diag(v) -&gt; replace with einsum when v is a vector</p>
+<h1 id="limitations">Limitations.</h1>
+<p>some functions ignore additional keyword arguments. This needs to be
+explicitly warned.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="fitany.autodiff.tracing.arraymax"><code class="name flex">
+<span>def <span class="ident">arraymax</span></span>(<span>a, axis=None, out=None, *, keepdims=&lt;no value&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.arraymin"><code class="name flex">
+<span>def <span class="ident">arraymin</span></span>(<span>a, axis=None, out=None, *, keepdims=&lt;no value&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.backtrace"><code class="name flex">
+<span>def <span class="ident">backtrace</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.check_broadcasting"><code class="name flex">
+<span>def <span class="ident">check_broadcasting</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks that opnodes or arrays can be broadcast. Used in addition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong></dt>
+<dd>the arguments to broadcast</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the arguments broadcast to the required shapes, or OpNodes which encapsulate
+broadcasting.</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.concat_spread"><code class="name flex">
+<span>def <span class="ident">concat_spread</span></span>(<span>*args, axis=0)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.convolve"><code class="name flex">
+<span>def <span class="ident">convolve</span></span>(<span>a, v, mode='full')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.correlate"><code class="name flex">
+<span>def <span class="ident">correlate</span></span>(<span>a, v, mode='valid')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.dims"><code class="name flex">
+<span>def <span class="ident">dims</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_concat"><code class="name flex">
+<span>def <span class="ident">do_concat</span></span>(<span>T, axis=0)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_diag"><code class="name flex">
+<span>def <span class="ident">do_diag</span></span>(<span>m)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_diagonal"><code class="name flex">
+<span>def <span class="ident">do_diagonal</span></span>(<span>m)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_diff"><code class="name flex">
+<span>def <span class="ident">do_diff</span></span>(<span>a, n=1, axis=-1, prepend=&lt;no value&gt;, append=&lt;no value&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_flatten"><code class="name flex">
+<span>def <span class="ident">do_flatten</span></span>(<span>m)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_flip"><code class="name flex">
+<span>def <span class="ident">do_flip</span></span>(<span>m, axis=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_fliplr"><code class="name flex">
+<span>def <span class="ident">do_fliplr</span></span>(<span>m, axis=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_flipud"><code class="name flex">
+<span>def <span class="ident">do_flipud</span></span>(<span>m, axis=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_hstack"><code class="name flex">
+<span>def <span class="ident">do_hstack</span></span>(<span>T)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_squeeze"><code class="name flex">
+<span>def <span class="ident">do_squeeze</span></span>(<span>m)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_trace"><code class="name flex">
+<span>def <span class="ident">do_trace</span></span>(<span>m)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.do_vstack"><code class="name flex">
+<span>def <span class="ident">do_vstack</span></span>(<span>T)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.getroot"><code class="name flex">
+<span>def <span class="ident">getroot</span></span>(<span>*args)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>return the first root node in a list of arguments</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong></dt>
+<dd>the argument list</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the root property of the first argument which is a Node</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.index"><code class="name flex">
+<span>def <span class="ident">index</span></span>(<span>obj, key)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>a function which does indexing, used in Node.<strong>getitem</strong></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong></dt>
+<dd>the object to index</dd>
+<dt><strong><code>key</code></strong></dt>
+<dd>the key to use for indexing</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>obj[key]</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.makeaddnode"><code class="name flex">
+<span>def <span class="ident">makeaddnode</span></span>(<span>fn, a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.maximum"><code class="name flex">
+<span>def <span class="ident">maximum</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.minimum"><code class="name flex">
+<span>def <span class="ident">minimum</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.mult"><code class="name flex">
+<span>def <span class="ident">mult</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.not_implemented"><code class="name flex">
+<span>def <span class="ident">not_implemented</span></span>(<span>f)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.notrace"><code class="name flex">
+<span>def <span class="ident">notrace</span></span>(<span>f)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>decorator to stop tracing inside a function</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>f</code></strong></dt>
+<dd>the function to be no-traced</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the function wrapped to return an OpNode instead
+of being evaluated.</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.oneover"><code class="name flex">
+<span>def <span class="ident">oneover</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.opnode"><code class="name flex">
+<span>def <span class="ident">opnode</span></span>(<span>fn, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>create an opnode or return a previous one with the same signature.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>fn</code></strong></dt>
+<dd>the function for the op0node</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>the positional args of the function</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>the keyword args of the function</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>an OpNode</p>
+<h2 id="note">Note</h2>
+<p>OpNodes should only be created using this function, because
+it
+a) checks to see if fn can be replaced by an einsum.
+b) checks to see if the opnode has already been created</p>
+<p>The latter case can occur if a variable is used more than once in a
+computation, and memoizing it can lead to a gain in speed.</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.pick"><code class="name flex">
+<span>def <span class="ident">pick</span></span>(<span>a, idx, axis, keepdims)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.powernode"><code class="name flex">
+<span>def <span class="ident">powernode</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.scipy_convolve"><code class="name flex">
+<span>def <span class="ident">scipy_convolve</span></span>(<span>in1, in2, mode='full', method='auto')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.scipy_correlate"><code class="name flex">
+<span>def <span class="ident">scipy_correlate</span></span>(<span>in1, in2, mode='full', method='auto')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.shape"><code class="name flex">
+<span>def <span class="ident">shape</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.tdiv"><code class="name flex">
+<span>def <span class="ident">tdiv</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.tensorconvolve"><code class="name flex">
+<span>def <span class="ident">tensorconvolve</span></span>(<span>a, v, mode='full', axes=-1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.tensorcorrelate"><code class="name flex">
+<span>def <span class="ident">tensorcorrelate</span></span>(<span>a, v, mode='full', axes=-1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.value_of"><code class="name flex">
+<span>def <span class="ident">value_of</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="fitany.autodiff.tracing.Node"><code class="flex name class">
+<span>class <span class="ident">Node</span></span>
+<span>(</span><span>value, root=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A computational Node encapsulates a value and records a computational trace
+of a function. A Node overrides numpy operations.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>np-array</code></dt>
+<dd>the value of the node</dd>
+<dt><strong><code>root</code></strong> :&ensp;<code><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></code></dt>
+<dd>the root node (VarNode) of the computational trace.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt>a computational node with properties</dt>
+<dt><code>
+value</code></dt>
+<dd>the given value
+ndim: the number of dimensions
+shape: the shape of the value</dd>
+</dl></div>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="fitany.autodiff.tracing.OpNode" href="#fitany.autodiff.tracing.OpNode">OpNode</a></li>
+<li><a title="fitany.autodiff.tracing.VarNode" href="#fitany.autodiff.tracing.VarNode">VarNode</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="fitany.autodiff.tracing.Node.handled_funcs"><code class="name">var <span class="ident">handled_funcs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="fitany.autodiff.tracing.Node.add_handler"><code class="name flex">
+<span>def <span class="ident">add_handler</span></span>(<span>f, g)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="fitany.autodiff.tracing.Node.isNode"><code class="name flex">
+<span>def <span class="ident">isNode</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks if an object is a Node</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.Node.iszero"><code class="name flex">
+<span>def <span class="ident">iszero</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks if an object is zero and not a Node</p></div>
+</dd>
+<dt id="fitany.autodiff.tracing.Node.register_handler"><code class="name flex">
+<span>def <span class="ident">register_handler</span></span>(<span>*flist)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="fitany.autodiff.tracing.OpNode"><code class="flex name class">
+<span>class <span class="ident">OpNode</span></span>
+<span>(</span><span>fn, *args, root=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A node which encapsulates an operation/function call</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>fn</code></strong></dt>
+<dd>the function implementing the operation</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>the arguments to pass to the function</dd>
+<dt><strong><code>root</code></strong></dt>
+<dd>the root node</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>keyword arguments for the function</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt>a Node with the following properties:</dt>
+<dt><code>
+value</code></dt>
+<dd>the value of fn(<em>args, </em>*kwargs)
+fn: the function
+args: the arguments
+kwargs: the keyword arguments.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="fitany.autodiff.tracing.VarNode"><code class="flex name class">
+<span>class <span class="ident">VarNode</span></span>
+<span>(</span><span>value)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A VarNode encapsulates a variable</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong></dt>
+<dd>the value of the node</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt>A VarNode object with Node properties and:</dt>
+<dt><code>
+derivshape</code></dt>
+<dd>the shape of the VarNode, which is used for
+forward-mode differentiation
+memo: used to memoize Nodes in the trace
+backrefs: used to store back references when preparing for
+reverse-mode differentiation</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#nodes">Nodes</a></li>
+<li><a href="#operations">Operations.</a></li>
+<li><a href="#limitations">Limitations.</a></li>
+</ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="fitany.autodiff" href="index.html">fitany.autodiff</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="fitany.autodiff.tracing.arraymax" href="#fitany.autodiff.tracing.arraymax">arraymax</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.arraymin" href="#fitany.autodiff.tracing.arraymin">arraymin</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.backtrace" href="#fitany.autodiff.tracing.backtrace">backtrace</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.check_broadcasting" href="#fitany.autodiff.tracing.check_broadcasting">check_broadcasting</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.concat_spread" href="#fitany.autodiff.tracing.concat_spread">concat_spread</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.convolve" href="#fitany.autodiff.tracing.convolve">convolve</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.correlate" href="#fitany.autodiff.tracing.correlate">correlate</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.dims" href="#fitany.autodiff.tracing.dims">dims</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_concat" href="#fitany.autodiff.tracing.do_concat">do_concat</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_diag" href="#fitany.autodiff.tracing.do_diag">do_diag</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_diagonal" href="#fitany.autodiff.tracing.do_diagonal">do_diagonal</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_diff" href="#fitany.autodiff.tracing.do_diff">do_diff</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_flatten" href="#fitany.autodiff.tracing.do_flatten">do_flatten</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_flip" href="#fitany.autodiff.tracing.do_flip">do_flip</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_fliplr" href="#fitany.autodiff.tracing.do_fliplr">do_fliplr</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_flipud" href="#fitany.autodiff.tracing.do_flipud">do_flipud</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_hstack" href="#fitany.autodiff.tracing.do_hstack">do_hstack</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_squeeze" href="#fitany.autodiff.tracing.do_squeeze">do_squeeze</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_trace" href="#fitany.autodiff.tracing.do_trace">do_trace</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.do_vstack" href="#fitany.autodiff.tracing.do_vstack">do_vstack</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.getroot" href="#fitany.autodiff.tracing.getroot">getroot</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.index" href="#fitany.autodiff.tracing.index">index</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.makeaddnode" href="#fitany.autodiff.tracing.makeaddnode">makeaddnode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.maximum" href="#fitany.autodiff.tracing.maximum">maximum</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.minimum" href="#fitany.autodiff.tracing.minimum">minimum</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.mult" href="#fitany.autodiff.tracing.mult">mult</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.not_implemented" href="#fitany.autodiff.tracing.not_implemented">not_implemented</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.notrace" href="#fitany.autodiff.tracing.notrace">notrace</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.oneover" href="#fitany.autodiff.tracing.oneover">oneover</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.opnode" href="#fitany.autodiff.tracing.opnode">opnode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.pick" href="#fitany.autodiff.tracing.pick">pick</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.powernode" href="#fitany.autodiff.tracing.powernode">powernode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.scipy_convolve" href="#fitany.autodiff.tracing.scipy_convolve">scipy_convolve</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.scipy_correlate" href="#fitany.autodiff.tracing.scipy_correlate">scipy_correlate</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.shape" href="#fitany.autodiff.tracing.shape">shape</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.tdiv" href="#fitany.autodiff.tracing.tdiv">tdiv</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.tensorconvolve" href="#fitany.autodiff.tracing.tensorconvolve">tensorconvolve</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.tensorcorrelate" href="#fitany.autodiff.tracing.tensorcorrelate">tensorcorrelate</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.value_of" href="#fitany.autodiff.tracing.value_of">value_of</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></code></h4>
+<ul class="">
+<li><code><a title="fitany.autodiff.tracing.Node.add_handler" href="#fitany.autodiff.tracing.Node.add_handler">add_handler</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.handled_funcs" href="#fitany.autodiff.tracing.Node.handled_funcs">handled_funcs</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
+<li><code><a title="fitany.autodiff.tracing.Node.register_handler" href="#fitany.autodiff.tracing.Node.register_handler">register_handler</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="fitany.autodiff.tracing.OpNode" href="#fitany.autodiff.tracing.OpNode">OpNode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="fitany.autodiff.tracing.VarNode" href="#fitany.autodiff.tracing.VarNode">VarNode</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

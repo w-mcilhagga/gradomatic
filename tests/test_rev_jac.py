@@ -4,13 +4,14 @@ import sys
 
 # this is intended to be used by pytest from parent directory
 
+
 up = os.path.normpath(os.path.join(os.getcwd(), "src"))
 sys.path.append(up)
 sys.path.append(os.getcwd())
 
 
 import numpy as np
-from fitany.reverse import jacobian
+from fitany.autodiff.reverse import jacobian
 import pytest
 
 from common_funcs import check_close, nd_jacobian

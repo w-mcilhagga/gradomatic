@@ -10,7 +10,7 @@ sys.path.append(os.getcwd())
 
 
 import numpy as np
-from fitany.forward import jacobian
+from fitany.autodiff.forward import jacobian
 import pytest
 
 from common_funcs import check_close, nd_jacobian

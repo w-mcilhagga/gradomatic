@@ -1,16 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
 import numpy as np
 from .tracing import (
     Node,
     VarNode,
-    OpNode,
     shape,
     dims,
     value_of,
-    getroot,
     index,
     backtrace,
     notrace,
@@ -432,10 +426,11 @@ def deriv_power(dYdZ, argno, base, ex, **kwargs):
     # this is only called when exponent is not a Node.
     # it's a ufunc, but has some efficiencies
     # argno is always zero (or it should be)
-    if ex == 1:
-        return dYdZ
-    if ex == 2:
-        return postmult(dYdZ, ex * base)
+    if np.isscalar(ex):
+        if ex == 1:
+            return dYdZ
+        if ex == 2:
+            return postmult(dYdZ, ex * base)
     return postmult(dYdZ, ex * np.power(base, ex - 1))
 
 
@@ -455,6 +450,7 @@ ufunc_derivs = {
     np.sqrt: lambda x: 0.5 * x ** (-0.5),
     np.abs: lambda x: signum(x) if use_subgrad else np.sign(x),
     np.sign: lambda x: 0,
+    signum: lambda x: 0,
     np.sin: np.cos,
     np.cos: lambda x: -np.sin(x),
     np.tan: lambda x: np.cos(x) ** (-2),
@@ -547,8 +543,12 @@ class Diff:
         self.vn = None
         self.fval = None
         self.j = None
+        self.h = None
 
     def __call__(self, *args, **kwargs):
+        return self.func(*args, **kwargs)
+    
+    def trace(self, *args, **kwargs):
         # call this if you want the function value &
         # will later want the jacobian.
         args = list(args)
@@ -557,25 +557,27 @@ class Diff:
         return value_of(self.fval)
 
     def jacobian(self, gc=False):
-        # works after __call__ is called
+        # works after trace is called
         self.j = derivative(self.fval)
-        # self.fval = None
         jac = value_of(self.j)
         if gc:
             self.gc()
         return jac
 
-    def hessian(self):
+    def hessian(self, gc=True):
         # works after jacobian is called
-        h = value_of(derivative(self.j))
-        self.gc()
-        return h
+        self.h = derivative(self.j)
+        hess = value_of(self.h)
+        if gc:
+            self.gc()
+        return hess
 
     def gc(self):
         # encourage GC:
         self.vn = None
         self.fval = None
         self.j = None
+        self.h = None
 
 
 def jacobian(f, argno=0):
@@ -583,7 +585,7 @@ def jacobian(f, argno=0):
     d = Diff(f, argno)
 
     def jac(*args, **kwargs):
-        d(*args, **kwargs)
+        d.trace(*args, **kwargs)
         return d.jacobian()
 
     return jac
@@ -593,7 +595,7 @@ def hessian(f, argno=0):
     d = Diff(f, argno)
 
     def hess(*args, **kwargs):
-        d(*args, **kwargs)
+        d.trace(*args, **kwargs)
         d.jacobian()
         return d.hessian()
 
