@@ -30,92 +30,43 @@
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="fitany.fit.lasso"><code class="name flex">
-<span>def <span class="ident">lasso</span></span>(<span>model, wt=1.0, index=None)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="fitany.fit.penalized"><code class="name flex">
-<span>def <span class="ident">penalized</span></span>(<span>model, penalty)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="fitany.fit.ridge"><code class="name flex">
-<span>def <span class="ident">ridge</span></span>(<span>model, wt=1.0, index=None)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
 <dt id="fitany.fit.Fit"><code class="flex name class">
 <span>class <span class="ident">Fit</span></span>
-<span>(</span><span>model=None, maxiters=20, conv=1e-05, fconv=1e-05, method=None, **kwargs)</span>
+<span>(</span><span>modelfn=None, scorefn=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>create a model fitting object</p>
 <h2 id="args">Args</h2>
 <dl>
-<dt><strong><code>model</code></strong></dt>
-<dd>a model function</dd>
-<dt><strong><code>maxiters</code></strong></dt>
-<dd>the maximum number of iterations for fitting</dd>
-<dt><strong><code>conv</code></strong></dt>
-<dd>the convergence criterion on beta for fitting</dd>
-<dt><strong><code>fconv</code></strong></dt>
-<dd>the convergence criterion on model(beta)</dd>
-<dt><strong><code>method</code></strong></dt>
-<dd>the minimization method, either newton_descent or
-subgrad_descent. If none, it is picked automatically</dd>
-<dt><strong><code>**hyper</code></strong></dt>
-<dd>hyperparameters for the model, if any</dd>
+<dt><strong><code>modelfn</code></strong></dt>
+<dd>a model function for fitting (penalized maybe)</dd>
+<dt><strong><code>scorefn</code></strong></dt>
+<dd>a scoring function (or hyperparams for the model)</dd>
 </dl>
 <h2 id="notes">Notes</h2>
 <p>The model function has a signature
-model(X, y, beta, **hyperparams)
+model(beta, <em>data </em>*hyperparams)
 where
-X is a tensor of features
-y is a tensor of observations
 beta is a tensor of values to fit
-hyperparams is a set of hyper parameters</p>
-<p>The first axis of y and X indexes the obsevations,
-so len(X)==len(y).</p>
-<p>The hyperparameters are for things like penalties,
-which can be varied by grid search. Default values <em>must</em>
-be supplied and will be used when scores are needed.</p>
-<p>That's actually a terrible idea, some of the hyperparams
-might be needed to get the score.</p></div>
+data is a list of data values
+hyperparams is a set of hyper parameters</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="fitany.fit.Fit.fit"><code class="name flex">
-<span>def <span class="ident">fit</span></span>(<span>self, X, y, **hyper)</span>
+<span>def <span class="ident">fit</span></span>(<span>self, *data, **hyper)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>find beta to minimize model(y,X,beta, **hyper)</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>X</code></strong></dt>
-<dd>tensor of explanatory variables</dd>
-<dt><strong><code>y</code></strong></dt>
-<dd>tensor of observations</dd>
-<dt><strong><code>hyper</code></strong></dt>
-<dd>named hyperparameters, if any</dd>
-</dl>
-<h2 id="note">Note</h2>
-<p>the hyperparameters are blended with existing hyperparameters</p></div>
+<div class="desc"><p>hyperparameters are both for minimization &amp; the model function</p></div>
 </dd>
 <dt id="fitany.fit.Fit.score"><code class="name flex">
-<span>def <span class="ident">score</span></span>(<span>self, X, y, **hyper)</span>
+<span>def <span class="ident">score</span></span>(<span>self, *data, **hyper)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>returns the value of model(X,y,self.coef_)</p></div>
+<div class="desc"><p>returns the value of scorefn</p></div>
 </dd>
 <dt id="fitany.fit.Fit.set_params"><code class="name flex">
 <span>def <span class="ident">set_params</span></span>(<span>self, **kwargs)</span>
@@ -137,13 +88,6 @@ might be needed to get the score.</p></div>
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="fitany" href="index.html">fitany</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="fitany.fit.lasso" href="#fitany.fit.lasso">lasso</a></code></li>
-<li><code><a title="fitany.fit.penalized" href="#fitany.fit.penalized">penalized</a></code></li>
-<li><code><a title="fitany.fit.ridge" href="#fitany.fit.ridge">ridge</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

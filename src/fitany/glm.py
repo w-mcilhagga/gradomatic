@@ -95,7 +95,6 @@ from .autodiff.tracing import notrace, value_of
 from .autodiff import forward as fwd
 from .autodiff import reverse as rev
 
-
 def GLM_Builder(loss, dLdmu, varfunc):
     r"""creates a new Generalized Linear Error model.
 
@@ -114,9 +113,11 @@ def GLM_Builder(loss, dLdmu, varfunc):
             This returns a vector with entries \( E(d Loss(y, \mu)/d\mu_i)^2\)
     Returns:
         A factory function for generalized linear models. This function takes a mean
-        function for the GLM. (A mean function takes parameters `b` and data
-        and returns the expected value of `y`) and returns a GLM
+        function for the GLM and returns a GLM likelihood
         function which takes `b`, `y`, and data and returns the log-likelihood.
+        
+        The mean function (or predictor) takes the parameter vector `b` and any data,
+        and returns `E(y)` the expected value of `y` given the parameters.
     """
 
     def GLM(meanfunc):
@@ -159,7 +160,7 @@ def GLM_Builder(loss, dLdmu, varfunc):
             if argno != 0:
                 return 0
             # if J has more than 2 dim, we need to allow for this.
-            return -dYdZ @ np.einsum("i,ij,ik->jk", varfunc(y, mu), J, J)
+            return -dYdZ @ np.einsum("i,ij,ik->jk", varfunc(y, mu), J, J, optimize=True)
 
         # forward mode
 
@@ -180,7 +181,7 @@ def GLM_Builder(loss, dLdmu, varfunc):
         @notrace
         def dL2fwd(b, y, mu, J):
             # this doesn't depend on b so has no higher derivatives
-            return -np.einsum("i,ij,ik->jk", varfunc(y, mu), J, J)
+            return -np.einsum("i,ij,ik->jk", varfunc(y, mu), J, J, optimize=True)
 
         return L
 
@@ -193,13 +194,17 @@ Gaussian = GLM_Builder(
     lambda y, mu: np.ones(y.shape),
 )
 __pdoc__[
-    "Gaussian"
-] = """function to build GLMs based on Gaussian or Normal errors.
+   "Gaussian"
+] = r"""function to build a GLM based on Gaussian or Normal loss.
 
 Args:
-    meanfunc (callable[b, X]): the mean function which returns `E(y)`
+    meanfunc (callable[b, args, kwargs]): the mean function which returns `E(y)`
 Returns:
     a GLM function which takes `b`, `y`, and `X` and returns the log-likelihood.
+Notes:
+    The Gaussian loss is \(Loss(y,\mu)=-\sum_i{\frac{(y_i-\mu_i)^2}{2\sigma^2}}\)
+    where \(\mu\) us supplied by the predictor. The value of \(\sigma\) is not important
+    for parameter estimation in the GLM.
 Example:
      `Gaussian(lambda b, X: X@b)` uses a linear mean function and returns a least-squares
      likelihood function. (In this case, however, you are better using linearGLM)
@@ -231,13 +236,15 @@ def _binomial_funcs():
 
 Binomial = GLM_Builder(*_binomial_funcs())
 __pdoc__[
-    "Binomial"
-] = """function to build GLMs based on Binomial errors.
+    r"Binomial"
+] = r"""function to build a GLM based on Binomial loss.
 
 Args:
-    meanfunc (callable[b, X]): the mean function which returns `E(y)`
+    meanfunc (callable[b, args, kwargs]): the mean function which returns `E(y)`
 Returns:
     a GLM function which takes `b`, `y`, and `X` and returns the log-likelihood.
+Notes:
+    The binomial loss is \(Loss(y,\mu)=\sum_i(y_i\log{\mu_i}+(1-y_i)\log{(1-\mu_i)})\)
 Example:
      `Binomial(lambda b,X: 1/(1+np.exp(-X@b)))` uses a logit mean function and 
      returns a logistic regression likelihood function. (In this case, however, 

@@ -2,10 +2,15 @@
 """
 common parameters for all tests
 """
+import os
+import sys
+#up = os.path.normpath(os.path.join(os.getcwd(), "src"))
+#sys.path.append(up)
+#sys.path.append(os.getcwd())
 
 import numpy as np
-
 import scipy.signal as sig
+from fitany.autodiff.tracing import tensorcorrelate, tensorconvolve
 
 ra = lambda *args: np.random.rand(*args)
 
@@ -108,11 +113,11 @@ unary = [
     (lambda x: np.diff(x, n=2, axis=1), mat1),
     (lambda x: np.correlate(value, x), value3),
     # (lambda x: np.correlate(x, x), value3), fails due to numdifftools
-    (lambda x: np.convolve(value, x), value3),
+    (lambda x: np.convolve(value, x), value3), 
     (lambda x: np.correlate(value, x), value4),
     (lambda x: np.convolve(value, x), value4),
-    (lambda x: np.tensorcorrelate(mat1, x), value3),
-    (lambda x: np.tensorconvolve(mat1, x), value3),
+    (lambda x: tensorcorrelate(mat1, x), value3),
+    (lambda x: tensorconvolve(mat1, x), value3),
     (lambda x: sig.correlate(ssig, x), sfilt),
     (lambda x: sig.convolve(ssig, x), sfilt),
     (lambda x: np.maximum(x, 0.5), value),

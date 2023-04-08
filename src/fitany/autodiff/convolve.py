@@ -12,7 +12,7 @@ shape = lambda x: getattr(x, "shape", ())
 dims = lambda x: getattr(x, "ndim", 0)
 
 
-def corrtensor_valid(a, b, axes=None):
+def _corrtensor_valid(a, b, axes=None):
     # Works out a tensor A such that
     # tensordot(A,b,axes) == tensorcorrel(a,b,axes,mode='valid')
     if axes is None:
@@ -39,7 +39,7 @@ def corrtensor_valid(a, b, axes=None):
     return ctensor
 
 
-def corrtensor_full(a, b, axes=None):
+def _corrtensor_full(a, b, axes=None):
     # Works out a tensor A such that
     # tensordot(A,b,axes) == tensorcorrel(a,b,axes,mode='full')
     if axes is None:
@@ -85,7 +85,7 @@ def corrtensor_full(a, b, axes=None):
     return ctensor
 
 
-def corrtensor_same(a, b, axes=None):
+def _corrtensor_same(a, b, axes=None):
     # corrtensor but for mode=same
     if axes is None:
         axes = dims(b)
@@ -93,7 +93,7 @@ def corrtensor_same(a, b, axes=None):
     # corrsz = np.array(shape(b)[:axes])
     # fullshape is the shape of the a*b results over the full shifts
     # fullshape = np.array(shape(a)[-axes:]) - corrsz + 1 + 2 * (corrsz - 1)
-    ctensor = corrtensor_full(a, b, axes=axes)
+    ctensor = _corrtensor_full(a, b, axes=axes)
     # extract the a-shaped part of ct
     ctensor_slice = [slice(None)] * dims(ctensor)
     for i in range(dims(a)):
@@ -105,31 +105,70 @@ def corrtensor_same(a, b, axes=None):
     return ctensor
 
 
-from weakref import WeakValueDictionary
+def _tensorcorrelate(a, v, mode="full", axes=-1, returntype='value'):
+    """correlation of two tensors
 
-Tcache = WeakValueDictionary()
+    Args:
+        a (numpy array): the tensor to correlate over
+        v (numpy array): the filter tensor
+        mode (string): either 'full', 'same', or 'valid'
+        axes: the number of axes to correlate. If not given, it is all
+            the axes of v.
+            tensorcorrelate(a,v,axes=n) will correlate
+            the last n axes of a with the first n axes of v.
+        returntype (string)): 'value' (default) 'callable', or 'tensor'
 
-
-def tensorcorrelate(a, v, mode="full", axes=-1):
-    # tensor correlation; it keeps the correlation tensor
-    # weakly because it's often reused
+    Returns:
+        The return value depends on returntype. 
+        * 'value': returns the convolution of a with v
+        * 'callable': returns a function of v which does the correlation
+        * 'tensor': returns the tensor which can do the correlation using
+          np.tensordot(tensor, v, axes=..) NB the default axes for tensordot
+          is not the same as the default for tensorcorrelate.
+    """
     if axes == -1:
         axes = dims(v)
-    key = (id(a), shape(v), mode, axes)
-    if key in Tcache:
-        ct = Tcache[key]
+    if mode == "full":
+        ct = _corrtensor_full(a, v, axes)
+    elif mode == "same":
+        ct = _corrtensor_same(a, v, axes)
+    elif mode == "valid":
+        ct = _corrtensor_valid(a, v, axes)
+    if returntype=='callable':
+        return lambda v: np.tensordot(ct, v, axes=axes)
+    if returntype=='value':
+        return np.tensordot(ct, v, axes=axes)
+    if returntype=='tensor':
+        return ct
+
+
+def _tensorconvolve(a, v, mode="full", axes=-1, returntype='value'):
+    """convolution of two tensors
+
+    Args:
+        a (numpy array): the tensor to correlate over
+        v (numpy array): the filter tensor
+        mode (string): either 'full', 'same', or 'valid'
+        axes: the number of axes to correlate. If not given, it is all
+            the axes of v.
+            tensorconvolve(a,v,axes=n) will convolve
+            the last n axes of a with the first n axes of v.
+        returntype (string)): 'value' (default) 'callable', or 'tensor'
+
+    Returns:
+        The return value depends on returntype. 
+        * 'value': returns the convolution of a with v
+        * 'callable': returns a function of v which does the correlation
+        * 'tensor': returns the tensor which can do the convolution using
+          np.tensordot(tensor, v[:,:,-1], axes=..) NB the default axes for tensordot
+          is not the same as the default for tensorconvolve
+    """
+    reverse = tuple([slice(None, None, -1)] * dims(v))
+    if returntype == 'value':
+        # reverse v
+        v = v[reverse]
+    result = _tensorcorrelate(a, v, mode=mode, axes=axes, returntype=returntype)
+    if returntype=='callable':
+        return lambda v: result(v[reverse])
     else:
-        if mode == "full":
-            ct = corrtensor_full(a, v, axes)
-        elif mode == "same":
-            ct = corrtensor_same(a, v, axes)
-        elif mode == "valid":
-            ct = corrtensor_valid(a, v, axes)
-        Tcache[key] = ct
-    return np.tensordot(ct, v, axes=axes)
-
-
-def tensorconvolve(a, v, mode="full", axes=-1):
-    # tensor convolution
-    v = v[tuple([slice(None, None, -1)] * dims(v))]
-    return tensorcorrelate(a, v, mode=mode, axes=axes)
+        return result

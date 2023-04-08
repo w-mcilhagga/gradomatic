@@ -45,8 +45,6 @@ def np_correlate(a, v, mode='valid'):
     result = []
     for i in range(len(a)-len(v)+1):
         result.append(np.reshape(np.sum(a[i:i+vlen]*v),(1,)))
-    # doesn't work in tracing.py because concatenate doesn't like it
-    print(result[0], getattr(result[0], 'value', ''))
     return np.hstack(result)
 
 def np_convolve(a, v, mode='full'):

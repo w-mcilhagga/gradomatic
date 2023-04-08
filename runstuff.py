@@ -16,15 +16,14 @@ from fitany.autodiff.subgrad import Subgrad
 from fitany.autodiff.printtrace import graph_fwd
 import fitany.autodiff.forward as fwd
 
-fwd.use_subgrad = True
+fwd.use_subgrad = False
 
-def lasso(x):
+def diff2(x):
     # min = (0,0,...0)
-    return np.sum(np.abs(x))   
+    return np.diff(x, n=2, prepend=[0,0], append=[0,0])
 
-ld = fwd.Diff(lasso)
-val = ld.trace(np.array([-1.0,0,1]))
-j = ld.jacobian()
-
-graph_fwd(ld.fval)
-print(ld.j.lo)
+x = np.array([1,2,3,4])
+print(diff2(x))
+ld = fwd.Diff(diff2)
+ld.trace(x)
+print(ld.jacobian())

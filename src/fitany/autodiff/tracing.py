@@ -37,7 +37,8 @@ explicitly warned.
 """
 
 # TODO:
-# amin, amax, less greater, etc (as that's how the comparisons are implemented)
+# less greater, etc (as that's how the comparisons are implemented)
+# pad, sort
 
 from collections import defaultdict
 from functools import wraps
@@ -539,13 +540,13 @@ def pick(a, idx, axis, keepdims):
     if axis is None:
         return a[np.unravel_index(idx, shape=shape(a))]
     # otherwise ... complicated
-    indices = np.meshgrid(*[range(n) for n in shape(a)], indexing = 'ij')
-    indices[axis]=idx
+    indices = np.meshgrid(*[range(n) for n in shape(a)], indexing="ij")
+    indices[axis] = idx
     pic = a[tuple(indices)]
     # pic is the same size as a with the dimension along axis repeated,
     # so this has to be removed
-    indices = [slice(None, None, None)]*dims(a)
-    indices[axis]=0
+    indices = [slice(None, None, None)] * dims(a)
+    indices[axis] = 0
     pic = pic[tuple(indices)]
     # insert the 1-sized index if keepdims is True
     if keepdims is True:
@@ -638,6 +639,8 @@ def do_diff(a, n=1, axis=-1, prepend=np._NoValue, append=np._NoValue):
 
     combined = []
     if prepend is not np._NoValue:
+        if isinstance(prepend, (list, tuple)):
+            prepend = np.array(prepend)
         if dims(prepend) == 0:
             shape_ = list(shape(a))
             shape_[axis] = 1
@@ -647,6 +650,8 @@ def do_diff(a, n=1, axis=-1, prepend=np._NoValue, append=np._NoValue):
     combined.append(a)
 
     if append is not np._NoValue:
+        if isinstance(append, (list, tuple)):
+            append = np.array(append)
         if dims(append) == 0:
             shape_ = list(shape(a))
             shape_[axis] = 1
@@ -684,11 +689,11 @@ def do_diff(a, n=1, axis=-1, prepend=np._NoValue, append=np._NoValue):
 
 
 from .lib import np_correlate, np_convolve
-from .convolve import tensorcorrelate as tcorr, tensorconvolve as tconv
+from .convolve import _tensorcorrelate as tcorr, _tensorconvolve as tconv
 
 
 @Node.register_handler(np.correlate)
-def correlate(a, v, mode="valid"):
+def _np_correlate(a, v, mode="valid"):
     if not Node.isNode(a):
         return tcorr(a, v, mode=mode)
     else:
@@ -696,28 +701,63 @@ def correlate(a, v, mode="valid"):
 
 
 @Node.register_handler(np.convolve)
-def convolve(a, v, mode="full"):
+def _np_convolve(a, v, mode="full"):
     if not Node.isNode(a):
         return tconv(a, v, mode=mode)
     else:
         return np_convolve(a, v, mode=mode)
 
 
-def tensorcorrelate(a, v, mode="full", axes=-1):
+def tensorcorrelate(a, v, mode="full", axes=-1, returntype='value'):
+    """correlation of two tensors
+
+    Args:
+        a (numpy array): the tensor to correlate over
+        v (numpy array): the filter tensor
+        mode (string): either 'full', 'same', or 'valid'
+        axes: the number of axes to correlate. If not given, it is all
+            the axes of v.
+            tensorcorrelate(a,v,axes=n) will correlate
+            the last n axes of a with the first n axes of v.
+        returntype (string)): 'value' (default) 'callable', or 'tensor'
+
+    Returns:
+        The return value depends on returntype. 
+        * 'value': returns the convolution of a with v
+        * 'callable': returns a function of v which does the correlation
+        * 'tensor': returns the tensor which can do the correlation using
+          np.tensordot(tensor, v, axes=..) NB the default axes for tensordot
+          is not the same as the default for tensorcorrelate.
+    """
     if Node.isNode(a):
-        raise ValueError("a cannot be a varnode")
-    return tcorr(a, v, mode=mode, axes=axes)
+        raise ValueError("a cannot be traced")
+    return tcorr(a, v, mode=mode, axes=axes, returntype=returntype)
 
 
-def tensorconvolve(a, v, mode="full", axes=-1):
+def tensorconvolve(a, v, mode="full", axes=-1, returntype='value'):
+    """convolution of two tensors
+
+    Args:
+        a (numpy array): the tensor to correlate over
+        v (numpy array): the filter tensor
+        mode (string): either 'full', 'same', or 'valid'
+        axes: the number of axes to correlate. If not given, it is all
+            the axes of v.
+            tensorconvolve(a,v,axes=n) will convolve
+            the last n axes of a with the first n axes of v.
+        returntype (string)): 'value' (default) 'callable', or 'tensor'
+
+    Returns:
+        The return value depends on returntype. 
+        * 'value': returns the convolution of a with v
+        * 'callable': returns a function of v which does the correlation
+        * 'tensor': returns the tensor which can do the convolution using
+          np.tensordot(tensor, v[:,:,-1], axes=..) NB the default axes for tensordot
+          is not the same as the default for tensorconvolve
+    """
     if Node.isNode(a):
-        raise ValueError("a cannot be a varnode")
-    return tconv(a, v, mode=mode, axes=axes)
-
-
-# add to numpy
-np.tensorcorrelate = tensorcorrelate
-np.tensorconvolve = tensorconvolve
+        raise ValueError("a cannot be traced")
+    return tconv(a, v, mode=mode, axes=axes, returntype=returntype)
 
 
 # numpy functions which aren't yet implemented will raise an error
@@ -740,6 +780,7 @@ for fn in [
     np.ediff1d,
     np.less,
     np.greater,  # etc.
+    np.pad,
 ]:
     (
         lambda fn: Node.add_handler(

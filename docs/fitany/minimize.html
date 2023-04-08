@@ -52,7 +52,7 @@ result = minimize(lambda x: f(x,2), np.random.rand(10))
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="fitany.minimize.maximize"><code class="name flex">
-<span>def <span class="ident">maximize</span></span>(<span>model, beta, maxiters=20, gconv=1e-08, xconv=0, fconv=0, method=None)</span>
+<span>def <span class="ident">maximize</span></span>(<span>model, beta, maxiters=20, gconv=1e-08, xconv=0, fconv=0, method=None, report=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>find beta which maximizes a function</p>
@@ -73,16 +73,19 @@ result = minimize(lambda x: f(x,2), np.random.rand(10))
 <dt><strong><code>method</code></strong> :&ensp;<code>callable</code></dt>
 <dd>the minimization method, either newton_descent or
 subgrad_descent. If none, it is picked automatically</dd>
+<dt><strong><code>report</code></strong> :&ensp;<code>int</code></dt>
+<dd>the reporting level, -1 means none; 0 is basic start/end,
+1 is every iteration, 2 is detail</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>A tuple <code>(beta, fval, converged_flag, number_of_iterations)</code>
+<p>An object containing {beta, fval, gradient, converged, message, iterations}
 where <code>beta</code> minimizes <code>model(beta)</code></p>
 <h2 id="notes">Notes</h2>
 <p>This simply calls <code>minimize(lambda b: -model(b), ...)</code>. See
 minimize for further details.</p></div>
 </dd>
 <dt id="fitany.minimize.minimize"><code class="name flex">
-<span>def <span class="ident">minimize</span></span>(<span>model, beta, maxiters=20, gconv=1e-08, xconv=0, fconv=0, method=None)</span>
+<span>def <span class="ident">minimize</span></span>(<span>model, beta, maxiters=20, gconv=1e-08, xconv=0, fconv=0, method=None, report=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>find beta which minimizes a function</p>
@@ -103,10 +106,13 @@ a single parameter beta.</dd>
 <dd>the convergence criterion on f = model(beta)</dd>
 <dt><strong><code>method</code></strong> :&ensp;<code>callable</code></dt>
 <dd>the minimization method, either newton_descent or
-subgrad_descent. If none, it is picked automatically</dd>
+subgrad_descent. If None, it is picked automatically</dd>
+<dt><strong><code>report</code></strong> :&ensp;<code>int</code></dt>
+<dd>the reporting level, -1 is none, 0 is basic start/end,
+1 is every iteration, 2 is details</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>A tuple <code>(beta, fval, converged_flag, number_of_iterations)</code>
+<p>An object containing {beta, fval, gradient, converged, message, iterations}
 where <code>beta</code> minimizes <code>model(beta)</code></p>
 <h2 id="notes">Notes</h2>
 <p>This chooses newton's method or subgradient descent,
@@ -115,11 +121,11 @@ Subgradients are generated when np.abs is used and
 autodiff.reverse.use_subgrad == True</p></div>
 </dd>
 <dt id="fitany.minimize.newton_descent"><code class="name flex">
-<span>def <span class="ident">newton_descent</span></span>(<span>model, beta, fval, grad, maxiters, gconv, xconv, fconv)</span>
+<span>def <span class="ident">newton_descent</span></span>(<span>model, beta, fval, grad, maxiters, gconv, xconv, fconv, report)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>find beta which minimizes a function using Newton's method. Called by
-maximize/minimize </p>
+maximize/minimize</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>model</code></strong></dt>
@@ -136,13 +142,15 @@ maximize/minimize </p>
 <dd>the convergence criterion on beta</dd>
 <dt><strong><code>fconv</code></strong></dt>
 <dd>the convergence criterion on model(beta)</dd>
+<dt><strong><code>report</code></strong></dt>
+<dd>the reporting level, -1 means none.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>(beta, fval, converged_flag, number_of_iterations)
+<p>An object containing {beta, fval, gradient, converged, message, iterations}
 where beta minimizes model(beta)</p></div>
 </dd>
 <dt id="fitany.minimize.subgrad_descent"><code class="name flex">
-<span>def <span class="ident">subgrad_descent</span></span>(<span>model, beta, fval, grad, maxiters, gconv, xconv, fconv)</span>
+<span>def <span class="ident">subgrad_descent</span></span>(<span>model, beta, fval, grad, maxiters, gconv, xconv, fconv, report)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>find beta which minimizes a function using subgradient descent</p>
@@ -162,9 +170,11 @@ where beta minimizes model(beta)</p></div>
 <dd>the convergence criterion on beta</dd>
 <dt><strong><code>fconv</code></strong></dt>
 <dd>the convergence criterion on model(beta)</dd>
+<dt><strong><code>report</code></strong></dt>
+<dd>the reporting level, -1 means none.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>(beta, fval, converged_flag, number_of_iterations)
+<p>An object containing {beta, fval, gradient, converged, message, iterations}
 where beta minimizes model(beta)</p></div>
 </dd>
 </dl>
