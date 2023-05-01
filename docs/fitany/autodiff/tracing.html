@@ -311,62 +311,6 @@ computation, and memoizing it can lead to a gain in speed.</p></div>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.tensorconvolve"><code class="name flex">
-<span>def <span class="ident">tensorconvolve</span></span>(<span>a, v, mode='full', axes=-1, returncall=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>convolution of two tensors</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>a</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>the tensor to correlate over</dd>
-<dt><strong><code>v</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>the filter tensor</dd>
-<dt><strong><code>mode</code></strong> :&ensp;<code>string</code></dt>
-<dd>either 'full', 'same', or 'valid'</dd>
-<dt><strong><code>axes</code></strong></dt>
-<dd>the number of axes to correlate. If not given, it is all
-the axes of v.
-tensorconvolve(a,v,axes=n) will convolve
-the last n axes of a with the first n axes of v.</dd>
-<dt><strong><code>returncall</code></strong> :&ensp;<code>bool</code></dt>
-<dd>whether to return a callable to compute the
-correlation, or the result. The callable is good if this
-particular correlation has to be done repeatedly</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p>If returncall is True, it returns a function which convolves
-a with tensors the same shape as v over the same axes.
-If returncall is False, it returns the result of the convolution</p></div>
-</dd>
-<dt id="fitany.autodiff.tracing.tensorcorrelate"><code class="name flex">
-<span>def <span class="ident">tensorcorrelate</span></span>(<span>a, v, mode='full', axes=-1, returncall=False)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>correlation of two tensors</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>a</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>the tensor to correlate over</dd>
-<dt><strong><code>v</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>the filter tensor</dd>
-<dt><strong><code>mode</code></strong> :&ensp;<code>string</code></dt>
-<dd>either 'full', 'same', or 'valid'</dd>
-<dt><strong><code>axes</code></strong></dt>
-<dd>the number of axes to correlate. If not given, it is all
-the axes of v.
-tensorcorrelate(a,v,axes=n) will correlate
-the last n axes of a with the first n axes of v.</dd>
-<dt><strong><code>returncall</code></strong> :&ensp;<code>bool</code></dt>
-<dd>whether to return a callable to compute the
-correlation, or the result. The callable is good if this
-particular correlation has to be done repeatedly</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p>If returncall is True, it returns a function which correlates
-a with tensors the same shape as v over the same axes.
-If returncall is False, it returns the result of the correlation</p></div>
-</dd>
 <dt id="fitany.autodiff.tracing.value_of"><code class="name flex">
 <span>def <span class="ident">value_of</span></span>(<span>x)</span>
 </code></dt>
@@ -572,8 +516,6 @@ reverse-mode differentiation</dd>
 <li><code><a title="fitany.autodiff.tracing.scipy_correlate" href="#fitany.autodiff.tracing.scipy_correlate">scipy_correlate</a></code></li>
 <li><code><a title="fitany.autodiff.tracing.shape" href="#fitany.autodiff.tracing.shape">shape</a></code></li>
 <li><code><a title="fitany.autodiff.tracing.tdiv" href="#fitany.autodiff.tracing.tdiv">tdiv</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.tensorconvolve" href="#fitany.autodiff.tracing.tensorconvolve">tensorconvolve</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.tensorcorrelate" href="#fitany.autodiff.tracing.tensorcorrelate">tensorcorrelate</a></code></li>
 <li><code><a title="fitany.autodiff.tracing.value_of" href="#fitany.autodiff.tracing.value_of">value_of</a></code></li>
 </ul>
 </li>

@@ -689,7 +689,7 @@ def do_diff(a, n=1, axis=-1, prepend=np._NoValue, append=np._NoValue):
 
 
 from .lib import np_correlate, np_convolve
-from .convolve import _tensorcorrelate as tcorr, _tensorconvolve as tconv
+from .convolve import tensorcorrelate as tcorr, tensorconvolve as tconv
 
 
 @Node.register_handler(np.correlate)
@@ -706,59 +706,6 @@ def _np_convolve(a, v, mode="full"):
         return tconv(a, v, mode=mode)
     else:
         return np_convolve(a, v, mode=mode)
-
-
-def tensorcorrelate(a, v, mode="full", axes=-1, returntype='value'):
-    """correlation of two tensors
-
-    Args:
-        a (numpy array): the tensor to correlate over
-        v (numpy array): the filter tensor
-        mode (string): either 'full', 'same', or 'valid'
-        axes: the number of axes to correlate. If not given, it is all
-            the axes of v.
-            tensorcorrelate(a,v,axes=n) will correlate
-            the last n axes of a with the first n axes of v.
-        returntype (string)): 'value' (default) 'callable', or 'tensor'
-
-    Returns:
-        The return value depends on returntype. 
-        * 'value': returns the convolution of a with v
-        * 'callable': returns a function of v which does the correlation
-        * 'tensor': returns the tensor which can do the correlation using
-          np.tensordot(tensor, v, axes=..) NB the default axes for tensordot
-          is not the same as the default for tensorcorrelate.
-    """
-    if Node.isNode(a):
-        raise ValueError("a cannot be traced")
-    return tcorr(a, v, mode=mode, axes=axes, returntype=returntype)
-
-
-def tensorconvolve(a, v, mode="full", axes=-1, returntype='value'):
-    """convolution of two tensors
-
-    Args:
-        a (numpy array): the tensor to correlate over
-        v (numpy array): the filter tensor
-        mode (string): either 'full', 'same', or 'valid'
-        axes: the number of axes to correlate. If not given, it is all
-            the axes of v.
-            tensorconvolve(a,v,axes=n) will convolve
-            the last n axes of a with the first n axes of v.
-        returntype (string)): 'value' (default) 'callable', or 'tensor'
-
-    Returns:
-        The return value depends on returntype. 
-        * 'value': returns the convolution of a with v
-        * 'callable': returns a function of v which does the correlation
-        * 'tensor': returns the tensor which can do the convolution using
-          np.tensordot(tensor, v[:,:,-1], axes=..) NB the default axes for tensordot
-          is not the same as the default for tensorconvolve
-    """
-    if Node.isNode(a):
-        raise ValueError("a cannot be traced")
-    return tconv(a, v, mode=mode, axes=axes, returntype=returntype)
-
 
 # numpy functions which aren't yet implemented will raise an error
 def not_implemented(f):
@@ -804,7 +751,7 @@ def scipy_correlate(in1, in2, mode="full", method="auto"):
         raise ValueError(
             "volume and kernel should have the same dimensionality"
         )
-    return tensorcorrelate(in1, in2, mode=mode, axes=-1)
+    return tcorr(in1, in2, mode=mode, axes=-1)
 
 
 @override("scipy.signal.convolve", np.ndarray, [VarNode, OpNode])
@@ -813,7 +760,7 @@ def scipy_convolve(in1, in2, mode="full", method="auto"):
         raise ValueError(
             "volume and kernel should have the same dimensionality"
         )
-    return tensorconvolve(in1, in2, mode=mode, axes=-1)
+    return tconv(in1, in2, mode=mode, axes=-1)
 
 
 # ## Backwards References.

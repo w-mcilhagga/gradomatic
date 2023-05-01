@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 12 15:05:30 2023
-
-@author: willi
+Convolution and correlation of tensors.
 """
 
 import numpy as np
 from itertools import product
+
+__pdoc__ = {
+    'shape': False,
+    'dims':False
+}
 
 shape = lambda x: getattr(x, "shape", ())
 dims = lambda x: getattr(x, "ndim", 0)
@@ -105,7 +108,14 @@ def _corrtensor_same(a, b, axes=None):
     return ctensor
 
 
-def _tensorcorrelate(a, v, mode="full", axes=-1, returntype='value'):
+corrtensor = {
+    "full": _corrtensor_full,
+    "same": _corrtensor_same,
+    "valid": _corrtensor_valid,
+}
+
+
+def tensorcorrelate(a, v, mode="full", axes=-1, returntype="value"):
     """correlation of two tensors
 
     Args:
@@ -116,33 +126,31 @@ def _tensorcorrelate(a, v, mode="full", axes=-1, returntype='value'):
             the axes of v.
             tensorcorrelate(a,v,axes=n) will correlate
             the last n axes of a with the first n axes of v.
-        returntype (string)): 'value' (default) 'callable', or 'tensor'
+        returntype (string): 'value' (default) 'callable', or 'tensor'
 
     Returns:
-        The return value depends on returntype. 
+        The return value depends on returntype.
+        
         * 'value': returns the convolution of a with v
         * 'callable': returns a function of v which does the correlation
         * 'tensor': returns the tensor which can do the correlation using
-          np.tensordot(tensor, v, axes=..) NB the default axes for tensordot
+          `np.tensordot(tensor, v, axes=..)` NB the default axes for tensordot
           is not the same as the default for tensorcorrelate.
     """
+    if not isinstance(a, np.ndarray):
+        raise ValueError('a must be a numpy array')
     if axes == -1:
         axes = dims(v)
-    if mode == "full":
-        ct = _corrtensor_full(a, v, axes)
-    elif mode == "same":
-        ct = _corrtensor_same(a, v, axes)
-    elif mode == "valid":
-        ct = _corrtensor_valid(a, v, axes)
-    if returntype=='callable':
+    ct = corrtensor[mode](a,v,axes)
+    if returntype == "callable":
         return lambda v: np.tensordot(ct, v, axes=axes)
-    if returntype=='value':
+    if returntype == "value":
         return np.tensordot(ct, v, axes=axes)
-    if returntype=='tensor':
+    if returntype == "tensor":
         return ct
 
 
-def _tensorconvolve(a, v, mode="full", axes=-1, returntype='value'):
+def tensorconvolve(a, v, mode="full", axes=-1, returntype="value"):
     """convolution of two tensors
 
     Args:
@@ -153,22 +161,29 @@ def _tensorconvolve(a, v, mode="full", axes=-1, returntype='value'):
             the axes of v.
             tensorconvolve(a,v,axes=n) will convolve
             the last n axes of a with the first n axes of v.
-        returntype (string)): 'value' (default) 'callable', or 'tensor'
+        returntype (string): 'value' (default) 'callable', or 'tensor'
 
     Returns:
-        The return value depends on returntype. 
-        * 'value': returns the convolution of a with v
+        The return value depends on returntype.
+        
+        * 'value': returns the convolution of the last axes of a with 
+          the first axes of v
         * 'callable': returns a function of v which does the correlation
         * 'tensor': returns the tensor which can do the convolution using
-          np.tensordot(tensor, v[:,:,-1], axes=..) NB the default axes for tensordot
-          is not the same as the default for tensorconvolve
+          `np.tensordot(tensor, v, axes=..)` NB the default axes for tensordot
+          is not the same as the default for tensorcorrelate
     """
-    reverse = tuple([slice(None, None, -1)] * dims(v))
-    if returntype == 'value':
-        # reverse v
-        v = v[reverse]
-    result = _tensorcorrelate(a, v, mode=mode, axes=axes, returntype=returntype)
-    if returntype=='callable':
-        return lambda v: result(v[reverse])
-    else:
-        return result
+    if not isinstance(a, np.ndarray):
+        raise ValueError('a must be a numpy array')
+    if axes == -1:
+        axes = dims(v)
+    ct = corrtensor[mode](a,v,axes)
+    # reverse the convolving axes
+    rev = tuple([slice(None)]*(dims(ct)-axes)+[slice(None,None,-1)]*axes)
+    ct = ct[rev]
+    if returntype == "callable":
+        return lambda v: np.tensordot(ct, v, axes=axes)
+    if returntype == "value":
+        return np.tensordot(ct, v, axes=axes)
+    if returntype == "tensor":
+        return ct

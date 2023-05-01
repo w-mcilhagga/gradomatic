@@ -2,15 +2,11 @@
 """
 common parameters for all tests
 """
-import os
-import sys
-#up = os.path.normpath(os.path.join(os.getcwd(), "src"))
-#sys.path.append(up)
-#sys.path.append(os.getcwd())
+
 
 import numpy as np
 import scipy.signal as sig
-from fitany.autodiff.tracing import tensorcorrelate, tensorconvolve
+from fitany.autodiff.convolve import tensorcorrelate, tensorconvolve
 
 ra = lambda *args: np.random.rand(*args)
 
