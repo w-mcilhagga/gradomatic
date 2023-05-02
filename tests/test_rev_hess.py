@@ -9,7 +9,7 @@ sys.path.append(up)
 sys.path.append(os.getcwd())
 
 
-from fitany.autodiff.reverse import hessian
+from maxmf.autodiff.reverse import hessian
 from numdifftools import Hessian as nd_hessian
 import pytest
 

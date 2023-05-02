@@ -13,7 +13,7 @@ sys.path.append(os.getcwd())
 
 
 import numpy as np
-from fitany.autodiff.tracing import VarNode
+from maxmf.autodiff.tracing import VarNode
 import pytest
 
 from common_funcs import check, check_close

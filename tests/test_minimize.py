@@ -9,8 +9,8 @@ sys.path.append(up)
 sys.path.append(os.getcwd())
 
 import numpy as np
-from fitany.minimize import minimize
-import fitany.autodiff.reverse as ar
+from maxmf.minimize import minimize
+import maxmf.autodiff.reverse as ar
 import pytest
 
 from min_funcs import funclist

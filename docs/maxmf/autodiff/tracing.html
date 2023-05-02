@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>fitany.autodiff.tracing API documentation</title>
+<title>maxmf.autodiff.tracing API documentation</title>
 <meta name="description" content="Tracing …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,7 +20,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>fitany.autodiff.tracing</code></h1>
+<h1 class="title">Module <code>maxmf.autodiff.tracing</code></h1>
 </header>
 <section id="section-intro">
 <p>Tracing.</p>
@@ -57,25 +57,25 @@ explicitly warned.</p>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="fitany.autodiff.tracing.arraymax"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.arraymax"><code class="name flex">
 <span>def <span class="ident">arraymax</span></span>(<span>a, axis=None, out=None, *, keepdims=&lt;no value&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.arraymin"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.arraymin"><code class="name flex">
 <span>def <span class="ident">arraymin</span></span>(<span>a, axis=None, out=None, *, keepdims=&lt;no value&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.backtrace"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.backtrace"><code class="name flex">
 <span>def <span class="ident">backtrace</span></span>(<span>node)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.check_broadcasting"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.check_broadcasting"><code class="name flex">
 <span>def <span class="ident">check_broadcasting</span></span>(<span>*args)</span>
 </code></dt>
 <dd>
@@ -89,91 +89,91 @@ explicitly warned.</p>
 <p>the arguments broadcast to the required shapes, or OpNodes which encapsulate
 broadcasting.</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.concat_spread"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.concat_spread"><code class="name flex">
 <span>def <span class="ident">concat_spread</span></span>(<span>*args, axis=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.dims"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.dims"><code class="name flex">
 <span>def <span class="ident">dims</span></span>(<span>x)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_concat"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_concat"><code class="name flex">
 <span>def <span class="ident">do_concat</span></span>(<span>T, axis=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_diag"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_diag"><code class="name flex">
 <span>def <span class="ident">do_diag</span></span>(<span>m)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_diagonal"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_diagonal"><code class="name flex">
 <span>def <span class="ident">do_diagonal</span></span>(<span>m)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_diff"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_diff"><code class="name flex">
 <span>def <span class="ident">do_diff</span></span>(<span>a, n=1, axis=-1, prepend=&lt;no value&gt;, append=&lt;no value&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_flatten"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_flatten"><code class="name flex">
 <span>def <span class="ident">do_flatten</span></span>(<span>m)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_flip"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_flip"><code class="name flex">
 <span>def <span class="ident">do_flip</span></span>(<span>m, axis=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_fliplr"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_fliplr"><code class="name flex">
 <span>def <span class="ident">do_fliplr</span></span>(<span>m, axis=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_flipud"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_flipud"><code class="name flex">
 <span>def <span class="ident">do_flipud</span></span>(<span>m, axis=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_hstack"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_hstack"><code class="name flex">
 <span>def <span class="ident">do_hstack</span></span>(<span>T)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_squeeze"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_squeeze"><code class="name flex">
 <span>def <span class="ident">do_squeeze</span></span>(<span>m)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_trace"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_trace"><code class="name flex">
 <span>def <span class="ident">do_trace</span></span>(<span>m)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.do_vstack"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.do_vstack"><code class="name flex">
 <span>def <span class="ident">do_vstack</span></span>(<span>T)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.getroot"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.getroot"><code class="name flex">
 <span>def <span class="ident">getroot</span></span>(<span>*args)</span>
 </code></dt>
 <dd>
@@ -186,7 +186,7 @@ broadcasting.</p></div>
 <h2 id="returns">Returns</h2>
 <p>the root property of the first argument which is a Node</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.index"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.index"><code class="name flex">
 <span>def <span class="ident">index</span></span>(<span>obj, key)</span>
 </code></dt>
 <dd>
@@ -201,37 +201,37 @@ broadcasting.</p></div>
 <h2 id="returns">Returns</h2>
 <p>obj[key]</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.makeaddnode"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.makeaddnode"><code class="name flex">
 <span>def <span class="ident">makeaddnode</span></span>(<span>fn, a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.maximum"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.maximum"><code class="name flex">
 <span>def <span class="ident">maximum</span></span>(<span>a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.minimum"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.minimum"><code class="name flex">
 <span>def <span class="ident">minimum</span></span>(<span>a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.mult"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.mult"><code class="name flex">
 <span>def <span class="ident">mult</span></span>(<span>a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.not_implemented"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.not_implemented"><code class="name flex">
 <span>def <span class="ident">not_implemented</span></span>(<span>f)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.notrace"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.notrace"><code class="name flex">
 <span>def <span class="ident">notrace</span></span>(<span>f)</span>
 </code></dt>
 <dd>
@@ -245,13 +245,13 @@ broadcasting.</p></div>
 <p>the function wrapped to return an OpNode instead
 of being evaluated.</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.oneover"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.oneover"><code class="name flex">
 <span>def <span class="ident">oneover</span></span>(<span>x)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.opnode"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.opnode"><code class="name flex">
 <span>def <span class="ident">opnode</span></span>(<span>fn, *args, **kwargs)</span>
 </code></dt>
 <dd>
@@ -275,43 +275,43 @@ b) checks to see if the opnode has already been created</p>
 <p>The latter case can occur if a variable is used more than once in a
 computation, and memoizing it can lead to a gain in speed.</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.pick"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.pick"><code class="name flex">
 <span>def <span class="ident">pick</span></span>(<span>a, idx, axis, keepdims)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.powernode"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.powernode"><code class="name flex">
 <span>def <span class="ident">powernode</span></span>(<span>a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.scipy_convolve"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.scipy_convolve"><code class="name flex">
 <span>def <span class="ident">scipy_convolve</span></span>(<span>in1, in2, mode='full', method='auto')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.scipy_correlate"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.scipy_correlate"><code class="name flex">
 <span>def <span class="ident">scipy_correlate</span></span>(<span>in1, in2, mode='full', method='auto')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.shape"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.shape"><code class="name flex">
 <span>def <span class="ident">shape</span></span>(<span>x)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.tdiv"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.tdiv"><code class="name flex">
 <span>def <span class="ident">tdiv</span></span>(<span>a, b)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.value_of"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.value_of"><code class="name flex">
 <span>def <span class="ident">value_of</span></span>(<span>x)</span>
 </code></dt>
 <dd>
@@ -322,7 +322,7 @@ computation, and memoizing it can lead to a gain in speed.</p></div>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="fitany.autodiff.tracing.Node"><code class="flex name class">
+<dt id="maxmf.autodiff.tracing.Node"><code class="flex name class">
 <span>class <span class="ident">Node</span></span>
 <span>(</span><span>value, root=None)</span>
 </code></dt>
@@ -333,7 +333,7 @@ of a function. A Node overrides numpy operations.</p>
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>np-array</code></dt>
 <dd>the value of the node</dd>
-<dt><strong><code>root</code></strong> :&ensp;<code><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></code></dt>
+<dt><strong><code>root</code></strong> :&ensp;<code><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></code></dt>
 <dd>the root node (VarNode) of the computational trace.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
@@ -347,37 +347,37 @@ shape: the shape of the value</dd>
 </dl></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="fitany.autodiff.tracing.OpNode" href="#fitany.autodiff.tracing.OpNode">OpNode</a></li>
-<li><a title="fitany.autodiff.tracing.VarNode" href="#fitany.autodiff.tracing.VarNode">VarNode</a></li>
+<li><a title="maxmf.autodiff.tracing.OpNode" href="#maxmf.autodiff.tracing.OpNode">OpNode</a></li>
+<li><a title="maxmf.autodiff.tracing.VarNode" href="#maxmf.autodiff.tracing.VarNode">VarNode</a></li>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="fitany.autodiff.tracing.Node.handled_funcs"><code class="name">var <span class="ident">handled_funcs</span></code></dt>
+<dt id="maxmf.autodiff.tracing.Node.handled_funcs"><code class="name">var <span class="ident">handled_funcs</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 </dl>
 <h3>Static methods</h3>
 <dl>
-<dt id="fitany.autodiff.tracing.Node.add_handler"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.Node.add_handler"><code class="name flex">
 <span>def <span class="ident">add_handler</span></span>(<span>f, g)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="fitany.autodiff.tracing.Node.isNode"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.Node.isNode"><code class="name flex">
 <span>def <span class="ident">isNode</span></span>(<span>n)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>checks if an object is a Node</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.Node.iszero"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.Node.iszero"><code class="name flex">
 <span>def <span class="ident">iszero</span></span>(<span>n)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>checks if an object is zero and not a Node</p></div>
 </dd>
-<dt id="fitany.autodiff.tracing.Node.register_handler"><code class="name flex">
+<dt id="maxmf.autodiff.tracing.Node.register_handler"><code class="name flex">
 <span>def <span class="ident">register_handler</span></span>(<span>*flist)</span>
 </code></dt>
 <dd>
@@ -385,7 +385,7 @@ shape: the shape of the value</dd>
 </dd>
 </dl>
 </dd>
-<dt id="fitany.autodiff.tracing.OpNode"><code class="flex name class">
+<dt id="maxmf.autodiff.tracing.OpNode"><code class="flex name class">
 <span>class <span class="ident">OpNode</span></span>
 <span>(</span><span>fn, *args, root=None, **kwargs)</span>
 </code></dt>
@@ -414,19 +414,19 @@ kwargs: the keyword arguments.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></li>
+<li><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></li>
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></b></code>:
+<li><code><b><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></b></code>:
 <ul class="hlist">
-<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.isNode" href="#maxmf.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.iszero" href="#maxmf.autodiff.tracing.Node.iszero">iszero</a></code></li>
 </ul>
 </li>
 </ul>
 </dd>
-<dt id="fitany.autodiff.tracing.VarNode"><code class="flex name class">
+<dt id="maxmf.autodiff.tracing.VarNode"><code class="flex name class">
 <span>class <span class="ident">VarNode</span></span>
 <span>(</span><span>value)</span>
 </code></dt>
@@ -450,14 +450,14 @@ reverse-mode differentiation</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></li>
+<li><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></li>
 </ul>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></b></code>:
+<li><code><b><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></b></code>:
 <ul class="hlist">
-<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.isNode" href="#maxmf.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.iszero" href="#maxmf.autodiff.tracing.Node.iszero">iszero</a></code></li>
 </ul>
 </li>
 </ul>
@@ -477,65 +477,65 @@ reverse-mode differentiation</dd>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="fitany.autodiff" href="index.html">fitany.autodiff</a></code></li>
+<li><code><a title="maxmf.autodiff" href="index.html">maxmf.autodiff</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
-<li><code><a title="fitany.autodiff.tracing.arraymax" href="#fitany.autodiff.tracing.arraymax">arraymax</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.arraymin" href="#fitany.autodiff.tracing.arraymin">arraymin</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.backtrace" href="#fitany.autodiff.tracing.backtrace">backtrace</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.check_broadcasting" href="#fitany.autodiff.tracing.check_broadcasting">check_broadcasting</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.concat_spread" href="#fitany.autodiff.tracing.concat_spread">concat_spread</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.dims" href="#fitany.autodiff.tracing.dims">dims</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_concat" href="#fitany.autodiff.tracing.do_concat">do_concat</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_diag" href="#fitany.autodiff.tracing.do_diag">do_diag</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_diagonal" href="#fitany.autodiff.tracing.do_diagonal">do_diagonal</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_diff" href="#fitany.autodiff.tracing.do_diff">do_diff</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_flatten" href="#fitany.autodiff.tracing.do_flatten">do_flatten</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_flip" href="#fitany.autodiff.tracing.do_flip">do_flip</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_fliplr" href="#fitany.autodiff.tracing.do_fliplr">do_fliplr</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_flipud" href="#fitany.autodiff.tracing.do_flipud">do_flipud</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_hstack" href="#fitany.autodiff.tracing.do_hstack">do_hstack</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_squeeze" href="#fitany.autodiff.tracing.do_squeeze">do_squeeze</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_trace" href="#fitany.autodiff.tracing.do_trace">do_trace</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.do_vstack" href="#fitany.autodiff.tracing.do_vstack">do_vstack</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.getroot" href="#fitany.autodiff.tracing.getroot">getroot</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.index" href="#fitany.autodiff.tracing.index">index</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.makeaddnode" href="#fitany.autodiff.tracing.makeaddnode">makeaddnode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.maximum" href="#fitany.autodiff.tracing.maximum">maximum</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.minimum" href="#fitany.autodiff.tracing.minimum">minimum</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.mult" href="#fitany.autodiff.tracing.mult">mult</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.not_implemented" href="#fitany.autodiff.tracing.not_implemented">not_implemented</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.notrace" href="#fitany.autodiff.tracing.notrace">notrace</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.oneover" href="#fitany.autodiff.tracing.oneover">oneover</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.opnode" href="#fitany.autodiff.tracing.opnode">opnode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.pick" href="#fitany.autodiff.tracing.pick">pick</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.powernode" href="#fitany.autodiff.tracing.powernode">powernode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.scipy_convolve" href="#fitany.autodiff.tracing.scipy_convolve">scipy_convolve</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.scipy_correlate" href="#fitany.autodiff.tracing.scipy_correlate">scipy_correlate</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.shape" href="#fitany.autodiff.tracing.shape">shape</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.tdiv" href="#fitany.autodiff.tracing.tdiv">tdiv</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.value_of" href="#fitany.autodiff.tracing.value_of">value_of</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.arraymax" href="#maxmf.autodiff.tracing.arraymax">arraymax</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.arraymin" href="#maxmf.autodiff.tracing.arraymin">arraymin</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.backtrace" href="#maxmf.autodiff.tracing.backtrace">backtrace</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.check_broadcasting" href="#maxmf.autodiff.tracing.check_broadcasting">check_broadcasting</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.concat_spread" href="#maxmf.autodiff.tracing.concat_spread">concat_spread</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.dims" href="#maxmf.autodiff.tracing.dims">dims</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_concat" href="#maxmf.autodiff.tracing.do_concat">do_concat</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_diag" href="#maxmf.autodiff.tracing.do_diag">do_diag</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_diagonal" href="#maxmf.autodiff.tracing.do_diagonal">do_diagonal</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_diff" href="#maxmf.autodiff.tracing.do_diff">do_diff</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_flatten" href="#maxmf.autodiff.tracing.do_flatten">do_flatten</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_flip" href="#maxmf.autodiff.tracing.do_flip">do_flip</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_fliplr" href="#maxmf.autodiff.tracing.do_fliplr">do_fliplr</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_flipud" href="#maxmf.autodiff.tracing.do_flipud">do_flipud</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_hstack" href="#maxmf.autodiff.tracing.do_hstack">do_hstack</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_squeeze" href="#maxmf.autodiff.tracing.do_squeeze">do_squeeze</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_trace" href="#maxmf.autodiff.tracing.do_trace">do_trace</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.do_vstack" href="#maxmf.autodiff.tracing.do_vstack">do_vstack</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.getroot" href="#maxmf.autodiff.tracing.getroot">getroot</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.index" href="#maxmf.autodiff.tracing.index">index</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.makeaddnode" href="#maxmf.autodiff.tracing.makeaddnode">makeaddnode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.maximum" href="#maxmf.autodiff.tracing.maximum">maximum</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.minimum" href="#maxmf.autodiff.tracing.minimum">minimum</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.mult" href="#maxmf.autodiff.tracing.mult">mult</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.not_implemented" href="#maxmf.autodiff.tracing.not_implemented">not_implemented</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.notrace" href="#maxmf.autodiff.tracing.notrace">notrace</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.oneover" href="#maxmf.autodiff.tracing.oneover">oneover</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.opnode" href="#maxmf.autodiff.tracing.opnode">opnode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.pick" href="#maxmf.autodiff.tracing.pick">pick</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.powernode" href="#maxmf.autodiff.tracing.powernode">powernode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.scipy_convolve" href="#maxmf.autodiff.tracing.scipy_convolve">scipy_convolve</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.scipy_correlate" href="#maxmf.autodiff.tracing.scipy_correlate">scipy_correlate</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.shape" href="#maxmf.autodiff.tracing.shape">shape</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.tdiv" href="#maxmf.autodiff.tracing.tdiv">tdiv</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.value_of" href="#maxmf.autodiff.tracing.value_of">value_of</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="fitany.autodiff.tracing.Node" href="#fitany.autodiff.tracing.Node">Node</a></code></h4>
+<h4><code><a title="maxmf.autodiff.tracing.Node" href="#maxmf.autodiff.tracing.Node">Node</a></code></h4>
 <ul class="">
-<li><code><a title="fitany.autodiff.tracing.Node.add_handler" href="#fitany.autodiff.tracing.Node.add_handler">add_handler</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.handled_funcs" href="#fitany.autodiff.tracing.Node.handled_funcs">handled_funcs</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.isNode" href="#fitany.autodiff.tracing.Node.isNode">isNode</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.iszero" href="#fitany.autodiff.tracing.Node.iszero">iszero</a></code></li>
-<li><code><a title="fitany.autodiff.tracing.Node.register_handler" href="#fitany.autodiff.tracing.Node.register_handler">register_handler</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.add_handler" href="#maxmf.autodiff.tracing.Node.add_handler">add_handler</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.handled_funcs" href="#maxmf.autodiff.tracing.Node.handled_funcs">handled_funcs</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.isNode" href="#maxmf.autodiff.tracing.Node.isNode">isNode</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.iszero" href="#maxmf.autodiff.tracing.Node.iszero">iszero</a></code></li>
+<li><code><a title="maxmf.autodiff.tracing.Node.register_handler" href="#maxmf.autodiff.tracing.Node.register_handler">register_handler</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="fitany.autodiff.tracing.OpNode" href="#fitany.autodiff.tracing.OpNode">OpNode</a></code></h4>
+<h4><code><a title="maxmf.autodiff.tracing.OpNode" href="#maxmf.autodiff.tracing.OpNode">OpNode</a></code></h4>
 </li>
 <li>
-<h4><code><a title="fitany.autodiff.tracing.VarNode" href="#fitany.autodiff.tracing.VarNode">VarNode</a></code></h4>
+<h4><code><a title="maxmf.autodiff.tracing.VarNode" href="#maxmf.autodiff.tracing.VarNode">VarNode</a></code></h4>
 </li>
 </ul>
 </li>

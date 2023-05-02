@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 
 
 import numpy as np
-from fitany.autodiff.reverse import jacobian
+from maxmf.autodiff.reverse import jacobian
 import pytest
 
 from common_funcs import check_close, nd_jacobian

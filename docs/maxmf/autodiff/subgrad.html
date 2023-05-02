@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>fitany.fit API documentation</title>
-<meta name="description" content="Fit API tryout" />
+<title>maxmf.autodiff.subgrad API documentation</title>
+<meta name="description" content="Created on Thu Mar 16 14:56:49 2023 …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -20,56 +20,122 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>fitany.fit</code></h1>
+<h1 class="title">Module <code>maxmf.autodiff.subgrad</code></h1>
 </header>
 <section id="section-intro">
-<p>Fit API tryout</p>
+<p>Created on Thu Mar 16 14:56:49 2023</p>
+<p>@author: willi</p>
 </section>
 <section>
 </section>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="maxmf.autodiff.subgrad.s_add"><code class="name flex">
+<span>def <span class="ident">s_add</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_div"><code class="name flex">
+<span>def <span class="ident">s_div</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_einsum"><code class="name flex">
+<span>def <span class="ident">s_einsum</span></span>(<span>script, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_mul"><code class="name flex">
+<span>def <span class="ident">s_mul</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_neg"><code class="name flex">
+<span>def <span class="ident">s_neg</span></span>(<span>a)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_pow"><code class="name flex">
+<span>def <span class="ident">s_pow</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.s_subtract"><code class="name flex">
+<span>def <span class="ident">s_subtract</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.signum"><code class="name flex">
+<span>def <span class="ident">signum</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.value_of"><code class="name flex">
+<span>def <span class="ident">value_of</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="fitany.fit.Fit"><code class="flex name class">
-<span>class <span class="ident">Fit</span></span>
-<span>(</span><span>modelfn=None, scorefn=None)</span>
+<dt id="maxmf.autodiff.subgrad.Subgrad"><code class="flex name class">
+<span>class <span class="ident">Subgrad</span></span>
+<span>(</span><span>a, b)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>create a model fitting object</p>
-<h2 id="args">Args</h2>
+<div class="desc"></div>
+<h3>Class variables</h3>
 <dl>
-<dt><strong><code>modelfn</code></strong></dt>
-<dd>a model function for fitting (penalized maybe)</dd>
-<dt><strong><code>scorefn</code></strong></dt>
-<dd>a scoring function (or hyperparams for the model)</dd>
+<dt id="maxmf.autodiff.subgrad.Subgrad.handled_funcs"><code class="name">var <span class="ident">handled_funcs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 </dl>
-<h2 id="notes">Notes</h2>
-<p>The model function has a signature
-model(beta, <em>data </em>*hyperparams)
-where
-beta is a tensor of values to fit
-data is a list of data values
-hyperparams is a set of hyper parameters</p></div>
+<h3>Static methods</h3>
+<dl>
+<dt id="maxmf.autodiff.subgrad.Subgrad.add_handler"><code class="name flex">
+<span>def <span class="ident">add_handler</span></span>(<span>f, g)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.Subgrad.assubgrad"><code class="name flex">
+<span>def <span class="ident">assubgrad</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.Subgrad.isgrad"><code class="name flex">
+<span>def <span class="ident">isgrad</span></span>(<span>n)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks if a subgrad object n is really a grad</p></div>
+</dd>
+<dt id="maxmf.autodiff.subgrad.Subgrad.register_handler"><code class="name flex">
+<span>def <span class="ident">register_handler</span></span>(<span>*flist)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
-<dt id="fitany.fit.Fit.fit"><code class="name flex">
-<span>def <span class="ident">fit</span></span>(<span>self, *data, **hyper)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>hyperparameters are both for minimization &amp; the model function</p></div>
-</dd>
-<dt id="fitany.fit.Fit.score"><code class="name flex">
-<span>def <span class="ident">score</span></span>(<span>self, *data, **hyper)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>returns the value of scorefn</p></div>
-</dd>
-<dt id="fitany.fit.Fit.set_params"><code class="name flex">
-<span>def <span class="ident">set_params</span></span>(<span>self, **kwargs)</span>
+<dt id="maxmf.autodiff.subgrad.Subgrad.asarray"><code class="name flex">
+<span>def <span class="ident">asarray</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -87,17 +153,33 @@ hyperparams is a set of hyper parameters</p></div>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="fitany" href="index.html">fitany</a></code></li>
+<li><code><a title="maxmf.autodiff" href="index.html">maxmf.autodiff</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="maxmf.autodiff.subgrad.s_add" href="#maxmf.autodiff.subgrad.s_add">s_add</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_div" href="#maxmf.autodiff.subgrad.s_div">s_div</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_einsum" href="#maxmf.autodiff.subgrad.s_einsum">s_einsum</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_mul" href="#maxmf.autodiff.subgrad.s_mul">s_mul</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_neg" href="#maxmf.autodiff.subgrad.s_neg">s_neg</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_pow" href="#maxmf.autodiff.subgrad.s_pow">s_pow</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.s_subtract" href="#maxmf.autodiff.subgrad.s_subtract">s_subtract</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.signum" href="#maxmf.autodiff.subgrad.signum">signum</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.value_of" href="#maxmf.autodiff.subgrad.value_of">value_of</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="fitany.fit.Fit" href="#fitany.fit.Fit">Fit</a></code></h4>
-<ul class="">
-<li><code><a title="fitany.fit.Fit.fit" href="#fitany.fit.Fit.fit">fit</a></code></li>
-<li><code><a title="fitany.fit.Fit.score" href="#fitany.fit.Fit.score">score</a></code></li>
-<li><code><a title="fitany.fit.Fit.set_params" href="#fitany.fit.Fit.set_params">set_params</a></code></li>
+<h4><code><a title="maxmf.autodiff.subgrad.Subgrad" href="#maxmf.autodiff.subgrad.Subgrad">Subgrad</a></code></h4>
+<ul class="two-column">
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.add_handler" href="#maxmf.autodiff.subgrad.Subgrad.add_handler">add_handler</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.asarray" href="#maxmf.autodiff.subgrad.Subgrad.asarray">asarray</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.assubgrad" href="#maxmf.autodiff.subgrad.Subgrad.assubgrad">assubgrad</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.handled_funcs" href="#maxmf.autodiff.subgrad.Subgrad.handled_funcs">handled_funcs</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.isgrad" href="#maxmf.autodiff.subgrad.Subgrad.isgrad">isgrad</a></code></li>
+<li><code><a title="maxmf.autodiff.subgrad.Subgrad.register_handler" href="#maxmf.autodiff.subgrad.Subgrad.register_handler">register_handler</a></code></li>
 </ul>
 </li>
 </ul>

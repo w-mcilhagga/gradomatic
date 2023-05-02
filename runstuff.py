@@ -12,9 +12,9 @@ sys.path.append(up)
 sys.path.append(os.getcwd())
 
 import numpy as np
-from fitany.autodiff.subgrad import Subgrad
-from fitany.autodiff.printtrace import graph_fwd
-import fitany.autodiff.forward as fwd
+from maxmf.autodiff.subgrad import Subgrad
+from maxmf.autodiff.printtrace import graph_fwd
+import maxmf.autodiff.forward as fwd
 
 fwd.use_subgrad = False
 

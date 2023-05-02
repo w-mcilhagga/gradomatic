@@ -6,7 +6,7 @@ common parameters for all tests
 
 import numpy as np
 import scipy.signal as sig
-from fitany.autodiff.convolve import tensorcorrelate, tensorconvolve
+from maxmf.autodiff.convolve import tensorcorrelate, tensorconvolve
 
 ra = lambda *args: np.random.rand(*args)
 

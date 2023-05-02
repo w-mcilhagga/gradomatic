@@ -9,9 +9,9 @@ sys.path.append(up)
 sys.path.append(os.getcwd())
 
 import numpy as np
-from fitany.glm import *
-import fitany.autodiff.reverse as rev
-import fitany.autodiff.forward as fwd
+from maxmf.glm import *
+import maxmf.autodiff.reverse as rev
+import maxmf.autodiff.forward as fwd
 from common_funcs import check_close
 import pytest
 
