@@ -13,7 +13,7 @@ def f(x):
     return np.sum(x**2)
 
 result = minimize(f, np.random.rand(10))
-# result[0] should be zeros
+# result['x'] should be zeros
 ```
 
 With more than one parameter:
@@ -22,11 +22,12 @@ def f(x, p):
     return np.sum(x**p)
 
 result = minimize(lambda x: f(x,2), np.random.rand(10))
-# result[0] should be zeros
+# result['x'] should be zeros
 ```
 
 """
 import numpy as np
+from .autodiff import forward, reverse # to set use_subgrad
 from .autodiff.reverse import (
     Diff,
 )  # we use reverse mode by default because its faster
@@ -34,8 +35,8 @@ from .autodiff.subgrad import Subgrad
 
 
 def minimize(
-    model,
-    beta,
+    func,
+    x,
     maxiters=20,
     gconv=1e-8,
     xconv=0,
@@ -44,16 +45,16 @@ def minimize(
     report=0,
     outsign=1
 ):
-    """find beta which minimizes a function
+    """find x which minimizes a function
 
     Args:
-        model (callable[numpy array]): the model function to minimize, having
-            a single parameter beta.
-        beta (numpy array): the initial value (a 1d vector)
+        func (callable[numpy array]): the function to minimize, having
+            a single parameter x.
+        x (numpy array): the initial value (a 1d vector)
         maxiters (int): the maximum number of iterations
         gconv (float): the convergence criterion for the gradient
-        xconv (float): the convergence criterion on beta
-        fconv (float): the convergence criterion on f = model(beta)
+        xconv (float): the convergence criterion on x
+        fconv (float): the convergence criterion on f = func(x)
         method (callable): the minimization method, either newton_descent or
                 subgrad_descent. If None, it is picked automatically
         report (int): the reporting level, -1 is none, 0 is basic start/end,
@@ -61,31 +62,34 @@ def minimize(
         outsign (float): the sign used to report function values
 
     Returns:
-        An object containing {beta, fval, gradient, converged, message, iterations}
-        where `beta` minimizes `model(beta)`
+        An object containing {x, fval, gradient, converged, message, iterations}
+        where `x` minimizes `func(x)`
 
     Notes:
         This chooses newton's method or subgradient descent,
-        depending on whether the first gradient us a subgradient or not.
-        Subgradients are generated when np.abs is used and
-        autodiff.reverse.use_subgrad == True
+        depending on whether the first gradient is a subgradient or not.
+        However if the method is set to newton, subgradients are not used.
+        (Subgradients are generated when np.abs is used and
+        autodiff.reverse.use_subgrad == True)
     """
-    model = Diff(model)
-    fval = model.trace(beta)
-    grad = model.jacobian()
+    reverse.set_config(use_subgrad = method!=newton_descent)
+    forward.set_config(use_subgrad = method!=newton_descent)
+    func = Diff(func)
+    fval = func.trace(x)
+    grad = func.jacobian()
     # choose the minimization routine based on the grad type
     if method is None:
         method = (
             subgrad_descent if isinstance(grad, Subgrad) else newton_descent
         )
     return method(
-        model, beta, fval, grad, maxiters, gconv, xconv, fconv, report, outsign=outsign
+        func, x, fval, grad, maxiters, gconv, xconv, fconv, report, outsign=outsign
     )
 
 
 def maximize(
-    model,
-    beta,
+    func,
+    x,
     maxiters=20,
     gconv=1e-8,
     xconv=0,
@@ -93,17 +97,17 @@ def maximize(
     method=None,
     report=0
 ):
-    """find beta which maximizes a function
+    """find x which maximizes a function
 
     See `minimize` for arguments & return value
 
     Notes:
-        This simply calls `minimize(lambda b: -model(b), ...)`. See
+        This simply calls `minimize(lambda b: -func(b), ...)`. See
         minimize for further details.
     """
-    neg_model = lambda x: -model(x)
+    neg_func = lambda x: -func(x)
     return minimize(
-        neg_model, beta, maxiters, gconv, xconv, fconv, method, report, outsign=-1
+        neg_func, x, maxiters, gconv, xconv, fconv, method, report, outsign=-1
     )
 
 
@@ -116,9 +120,9 @@ def _reporter(level, current, *args):
 
 
 def newton_descent(
-    model, beta, fval, grad, maxiters, gconv, xconv, fconv, report, outsign=1
+    func, x, fval, grad, maxiters, gconv, xconv, fconv, report, outsign=1
 ):
-    """find beta which minimizes a function using Newton's method. Called by
+    """find x which minimizes a function using Newton's method. Called by
     maximize/minimize
 
     See `minimize` for arguments & return value
@@ -126,7 +130,7 @@ def newton_descent(
     reporter = lambda *args: _reporter(report, *args)
 
     newfval = fval
-    newbeta = beta
+    newx = x
     converged = False
     message = "maxiters exceeded"
     reporter(0, "Newton's method")
@@ -146,46 +150,46 @@ def newton_descent(
         try:
             # try a newton step
             steptype='newton step'
-            hess = model.hessian()
+            hess = func.hessian()
             delta, _, _, sing = np.linalg.lstsq(hess, -grad, rcond=None)
             if np.max(np.abs(sing)) < eps:
                 raise RuntimeError("singular")
-            newbeta = beta + delta
-            newfval = model(newbeta)
+            newx = x + delta
+            newfval = func(newx)
             # we should backtrack the step to satisfy "good" descent.
             if newfval < fval:
                 step = 1.0
                 dg = np.dot(delta, grad)
                 dhd = 0.5 * np.einsum("i,ij,j->", delta, hess, delta)
                 predicted = lambda step: 0.5*(step * dg + step * step * dhd)
-                actual = lambda step: model(beta+step*delta)-fval
+                actual = lambda step: func(x+step*delta)-fval
                 if (newfval-fval)>predicted(1.0):
                     # failed the prediction, shrink
                     step = _linesearch(actual, predicted)
                 if step<1.0:
                     steptype = f'shrunken newton step {step}'
-                newbeta = beta + step * delta
-                newfval = model(newbeta)
+                newx = x + step * delta
+                newfval = func(newx)
             if newfval > fval or np.isnan(newfval):
                 # the newton step went wrong somehow,
                 raise RuntimeError("newton failed")
         except (RuntimeError, np.linalg.LinAlgError):
             # try a descent step
             steptype='descent step'
-            newbeta = _descent(model, beta, grad, fval)
+            newx = _descent(func, x, grad, fval)
             if np.isnan(newfval):
                 raise RuntimeError("descent failed")
-        newfval = model.trace(newbeta)
+        newfval = func.trace(newx)
         # convergence flags
         better = newfval <= fval
-        beta_conv = np.max(np.abs(newbeta - beta)) < xconv
+        x_conv = np.max(np.abs(newx - x)) < xconv
         f_conv = abs(newfval - fval) < (1 + abs(fval)) * fconv
         # update
-        beta, fval = newbeta, newfval
+        x, fval = newx, newfval
         gradsz = np.linalg.norm(grad)/len(grad)
         reporter(1, f"Iteration {iter+1:4d} fval {outsign*fval:8g} grad {gradsz:6e} : {steptype}")
         # check convergence
-        if beta_conv and better:
+        if x_conv and better:
             reporter(
                 0,
                 f"Parameter convergence in iteration {iter+1}, final value {outsign*newfval}",
@@ -202,14 +206,14 @@ def newton_descent(
             message = "small difference in function value"
             break
         # compute grad for next iteration
-        grad = model.jacobian()
+        grad = func.jacobian()
 
     if not converged:
         reporter(0, f"Did not converge in {iter+1} iterations.")
 
     return {
         "fval": outsign*newfval,
-        "beta": newbeta,
+        "x": newx,
         "grad": grad,
         # maxiters = 1 is for linear regression problems
         "converged": converged or maxiters == 1,
@@ -253,44 +257,46 @@ def _linesearch(actual, predicted, initstep=1.0, extend=True):
     # contract until you find a step where the actual drop
     # is better than the predicted
     poor = lambda a, p: a>0 or p>0 or a>p
-    while poor(actual(step), predicted(step)): 
+    iters = 0
+    while poor(actual(step), predicted(step)) and iters<10: 
         step = step/2
+        iters += 1
     return step
     
-def _descent(func, beta, grad, fval, initstep=1.0, extend=True):
-    """find `beta+a*grad` which roughly minimizes a function.
+def _descent(func, x, grad, fval, initstep=1.0, extend=True):
+    """find `x+a*grad` which roughly minimizes a function.
     Internal function - don't use
 
     Args:
         func: a Diff object containing the function
-        beta: the initial value (a 1d vector)
-        grad: the gradient of the model at beta
-        fval: the value of model(beta)
+        x: the initial value (a 1d vector)
+        grad: the gradient of the func at x
+        fval: the value of func(x)
 
     Returns:
-        `newbeta = beta+a*grad` which sufficiently decreases `model(newbeta)`
+        `newx = x+a*grad` which sufficiently decreases `func(newx)`
         within limits set by Armijo conditions
     """
     step = initstep
     normg2 = np.dot(grad, grad)
     # we step in the direction -step*grad
     predicted = lambda step: -0.5*step*normg2
-    actual = lambda step: func(beta-step*grad)-fval
+    actual = lambda step: func(x-step*grad)-fval
     step = _linesearch(actual, predicted, initstep, extend)
-    return beta-step*grad
+    return x-step*grad
 
 
 def subgrad_descent(
-    model, beta, fval, grad, maxiters, gconv, xconv, fconv, report, outsign
+    func, x, fval, grad, maxiters, gconv, xconv, fconv, report, outsign
 ):
-    """find beta which minimizes a function using subgradient descent
+    """find x which minimizes a function using subgradient descent
 
     See `minimize` for arguments & return value
     """
     reporter = lambda *args: _reporter(report, *args)
 
     newfval = fval
-    newbeta = beta
+    newx = x
     converged = False
     message = "maxiters exceeded"
     reporter(0, "Subgradient descent method")
@@ -306,25 +312,25 @@ def subgrad_descent(
             converged = True
             message = "gradient small"
             break
-        newbeta = _descent(model, beta, grad, fval)
-        # retract newbeta if it changes sign, assuming
+        newx = _descent(func, x, grad, fval)
+        # retract newx if it changes sign, assuming
         # the grad will flip sign.
-        signchange = np.sign(beta) != np.sign(newbeta)
+        signchange = np.sign(x)* np.sign(newx)<0
         if np.any(signchange):
-            b = beta[signchange]
-            nb = newbeta[signchange]
+            b = x[signchange]
+            nb = newx[signchange]
             alpha = np.min(np.abs(b) / np.abs(nb - b))
-            newbeta = beta + alpha * (newbeta - beta)
-        newfval = model.trace(newbeta)
+            newx = x + alpha * (newx - x)
+        newfval = func.trace(newx)
         # xconvergence flags
         better = newfval <= fval
-        beta_conv = np.max(np.abs(newbeta - beta)) < xconv
+        x_conv = np.max(np.abs(newx - x)) < xconv
         f_conv = abs(newfval - fval) < (1 + abs(fval)) * fconv
         # update
-        beta, fval = newbeta, newfval
+        x, fval = newx, newfval
         reporter(1, f"Iteration {iter+1} fval {outsign*fval}")
         # check convergence
-        if beta_conv and better:
+        if x_conv and better:
             reporter(
                 0,
                 f"Parameter convergence in iteration {iter+1}, final value {outsign*newfval}",
@@ -341,14 +347,14 @@ def subgrad_descent(
             message = "small difference in function value"
             break
         # compute grad for next iteration
-        grad = model.jacobian()
+        grad = func.jacobian()
 
     if not converged:
         reporter(0, f"Did not converge in {iter+1} iterations.")
 
     return {
         "fval": outsign*newfval,
-        "beta": newbeta,
+        "x": newx,
         "grad": grad,
         "converged": converged,
         "message": message,

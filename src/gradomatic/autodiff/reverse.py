@@ -14,8 +14,13 @@ from .memoize import memoize
 
 from .subgrad import signum
 
-use_subgrad = False
+config = {
+    'use_subgrad': False
+    }
 
+def set_config(**kwargs):
+    global config
+    config = {**config, **kwargs}
 
 def tensor_eye(shape):
     """returns the identity tensor
@@ -448,7 +453,7 @@ ufunc_derivs = {
     np.exp: np.exp,
     np.log: np.reciprocal,
     np.sqrt: lambda x: 0.5 * x ** (-0.5),
-    np.abs: lambda x: signum(x) if use_subgrad else np.sign(x),
+    np.abs: lambda x: signum(x) if config['use_subgrad'] else np.sign(x),
     np.sign: lambda x: 0,
     signum: lambda x: 0,
     np.sin: np.cos,

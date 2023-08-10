@@ -12,18 +12,29 @@ sys.path.append(up)
 sys.path.append(os.getcwd())
 
 import numpy as np
-from maxmf.autodiff.subgrad import Subgrad
-from maxmf.autodiff.printtrace import graph_fwd
-import maxmf.autodiff.forward as fwd
+from maxmf.fit import Fit
 
-fwd.use_subgrad = False
+X = np.random.rand(300, 10)
+x = np.random.rand(10) - 0.5
+y = X @ x + 0.5 * (np.random.rand(300) - 0.5)
 
-def diff2(x):
-    # min = (0,0,...0)
-    return np.diff(x, n=2, prepend=[0,0], append=[0,0])
 
-x = np.array([1,2,3,4])
-print(diff2(x))
-ld = fwd.Diff(diff2)
-ld.trace(x)
-print(ld.jacobian())
+def ls(beta, X, y, **kwargs):
+    return -np.sum((y - X @ beta) ** 2)
+
+
+fitter = Fit(
+    lambda x, X, y, wt: ls(x, X, y) - wt * np.sum(np.abs(x)),
+    ls,
+    wt=15.0,
+    initx=np.zeros((10,)),
+    fitparams={"maxiters": 500, 'fconv':1e-5},
+)
+
+fitter.fit(X, y)
+print(fitter.fval_)
+print(fitter.score(X, y))
+
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(fitter, X, y, cv=5)
